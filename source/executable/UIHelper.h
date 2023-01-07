@@ -1,4 +1,4 @@
 #pragma once
-class Application
+class UIHelper
 {
 };

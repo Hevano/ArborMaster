@@ -30,7 +30,10 @@ target_compile_features(ArborMaster_lib PUBLIC cxx_std_20)
 
 # ---- Declare executable ----
 
-add_executable(ArborMaster_exe source/main.cpp)
+# glob is not modern cmake, find better alternative
+file (GLOB sources  "./source/executable/*.cpp" "./source/executable/*.h")
+
+add_executable(ArborMaster_exe ${sources})
 add_executable(ArborMaster::exe ALIAS ArborMaster_exe)
 
 set_property(TARGET ArborMaster_exe PROPERTY OUTPUT_NAME ArborMaster)
