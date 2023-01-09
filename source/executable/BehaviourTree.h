@@ -1,5 +1,6 @@
 #pragma once
 #include "TreeNode.h"
+#include "Blackboard.h"
 
 #include <string>
 #include <memory>
@@ -8,9 +9,10 @@ namespace ArborMaster {
   {
   private:
     std::shared_ptr<TreeNode> m_root;
+    Blackboard m_blackboard;
 
   public:
-    void setPath(const std::string& path);
-    const std::string & getPath() const;
+    void adjustLayout();
+    void updateBlackboard();
   };
 }

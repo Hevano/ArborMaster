@@ -1,5 +1,6 @@
 #pragma once
 #include "Blackboard.h"
+#include "BehaviourTree.h"
 
 #include <string>
 #include <memory>

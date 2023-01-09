@@ -2,6 +2,8 @@
 #include "BehaviourTree.h"
 #include "AIActor.h"
 #include "NodeFactory.h"
+#include "UIHelper.h"
+
 
 #include <unordered_map>
 #include <string>
@@ -12,6 +14,7 @@ namespace ArborMaster
 {
   class Application
   {
+    friend class UIHelper;
   private:
     BehaviourTree m_editorTree;
     std::unordered_map<std::string, AIActor> m_actors;
@@ -23,7 +26,7 @@ namespace ArborMaster
   public:
     void run();
     void setSourcePath(const std::string& path);
-    void import();
+    void importNodes();
     void exportTree();
     void saveTree();
     void newTree();
