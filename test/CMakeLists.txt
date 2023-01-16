@@ -1,3 +1,4 @@
+cmake_minimum_required(VERSION 3.14)
 # Parent project does not export its library target, so this CML implicitly
 # depends on being added from it, i.e. the testing is done only from the build
 # tree and is not feasible from an install location
@@ -5,13 +6,32 @@
 project(ArborMasterTests LANGUAGES CXX)
 
 # ---- Tests ----
+set(CMAKE_CXX_STANDARD 14)
+
+add_compile_options(
+    /W0
+)
+
+include(FetchContent)
+FetchContent_Declare(
+  googletest
+  GIT_REPOSITORY https://github.com/google/googletest
+  GIT_TAG release-1.11.0)
+
+# For Windows: Prevent overriding the parent project's compiler/linker settings
+set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+FetchContent_MakeAvailable(googletest)
+
+enable_testing()
 
 add_executable(ArborMaster_test source/ArborMaster_test.cpp)
-target_link_libraries(ArborMaster_test PRIVATE ArborMaster_lib)
-target_compile_features(ArborMaster_test PRIVATE cxx_std_20)
+target_link_libraries(ArborMaster_test PRIVATE GTest::gtest_main)
+target_compile_features(ArborMaster_test PRIVATE 
+	cxx_std_20
+)
 
-add_test(NAME ArborMaster_test COMMAND ArborMaster_test)
+include(GoogleTest)
+gtest_discover_tests(ArborMaster_test)
+
 
 # ---- End-of-file commands ----
-
-add_folders(Test)

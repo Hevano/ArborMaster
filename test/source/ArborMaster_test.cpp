@@ -1,8 +1,14 @@
-#include "lib.hpp"
+#include <gtest/gtest.h>
 
-auto main() -> int
+
+// Demonstrate some basic assertions.
+TEST(YuckTest, BasicAssertions)
 {
-  auto const lib = library {};
+  EXPECT_STRNE("hello", "world");
+}
 
-  return lib.name == "ArborMaster" ? 0 : 1;
+int main(int argc, char** argv)
+{
+  ::testing::InitGoogleTest(&argc, argv);
+  return RUN_ALL_TESTS();
 }
