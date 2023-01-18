@@ -1,11 +1,10 @@
 #include <gtest/gtest.h>
+#include "lib.h"
+#include "TreeNodeTest.h"
+#include "BehaviourTreeTest.h"
 
 
-// Demonstrate some basic assertions.
-TEST(YuckTest, BasicAssertions)
-{
-  EXPECT_STRNE("hello", "world");
-}
+
 
 int main(int argc, char** argv)
 {
