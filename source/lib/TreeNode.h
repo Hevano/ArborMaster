@@ -15,8 +15,10 @@ public:
   std::set<std::string> blackboardKeys;
 
 public:
-  void reorderChild(const TreeNode& t, int index);
-  void addChild(TreeNode, int index);
+  void reorderChild(const TreeNode& t, int index = 0);
+  //Copies child into children at index, up to childCap. Returns false on invalid index or above cap
+  bool insertChild(const TreeNode& t, int index = 0);
+  void removeChild(const int index);
 };
 }
 
