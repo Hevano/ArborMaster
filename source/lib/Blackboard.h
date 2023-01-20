@@ -1,15 +1,14 @@
 #pragma once
-#include <unordered_map>
+#include <unordered_set>
 #include <string>
-#include <any>
 namespace ArborMaster
 {
 
-//There may be a conceptual difference between blackboards at runtime and blackboards at design time
+//Represents the design-time keys in the blackboard
 class Blackboard
 {
 public:
-  std::unordered_map<std::string, std::any> data;
+  std::unordered_set<std::string> data;
 
 public:
   bool hasKey(const std::string & keyName) const;

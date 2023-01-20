@@ -2,7 +2,7 @@
 
 namespace ArborMaster
 {
-void TreeNode::reorderChild(const TreeNode& t, int index) {}
-bool TreeNode::insertChild(const TreeNode& t, int index) {}
+void TreeNode::reorderChild(int oldIndex, int newIndex) {}
+bool TreeNode::insertChild(const TreeNode& t, int index) {return false;}
 void TreeNode::removeChild(const int index) {}
 }

@@ -12,7 +12,10 @@ namespace ArborMaster {
     Blackboard m_blackboard;
 
   public:
-    void adjustLayout();
+    BehaviourTree();
     void updateBlackboard();
+    TreeNode& getRoot();
+    const Blackboard& getBlackboard();
+
   };
 }

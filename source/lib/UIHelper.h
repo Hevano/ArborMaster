@@ -11,6 +11,7 @@ namespace ArborMaster
 // Forward declarations
 class Application;
 class BehaviourTree;
+class TreeNode;
 
 class UIHelper
 {
@@ -18,7 +19,7 @@ private:
   ImVec2 m_screenOffset;
 public:
   void draw(const Application& a);
-
+  void adjustTreeLayout(const TreeNode& root);
 private:
   void drawExportPopup(const Application& a);
   void drawImportPopup(const Application& a);

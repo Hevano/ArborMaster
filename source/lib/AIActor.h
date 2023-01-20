@@ -4,6 +4,9 @@
 
 #include <string>
 #include <memory>
+#include <unordered_map>
+#include <unordered_set>
+#include <any>
 
 namespace ArborMaster
 {
@@ -14,11 +17,15 @@ public:
 
 private:
   std::shared_ptr<BehaviourTree> m_tree;
-  Blackboard m_bb;
+  std::unordered_map<std::string, std::any> m_blackboardData;
 
 public:
+  AIActor() = default;
+  AIActor(BehaviourTree& t, const std::string& l);
   const BehaviourTree& getTree() const;
-  const Blackboard& getBlackboard() const;
+  const std::unordered_map<std::string, std::any>& getBlackboard() const;
+  const std::unordered_set<std::string>& getBlackboardKeys() const;
+  void setBlackboard(const Blackboard& bb);
 };
 }
 

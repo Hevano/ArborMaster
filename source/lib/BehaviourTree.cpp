@@ -2,6 +2,16 @@
 
 namespace ArborMaster
 {
-void BehaviourTree::adjustLayout() {}
+BehaviourTree::BehaviourTree() {
+  m_root = std::make_shared<TreeNode>(TreeNode());
+}
 void BehaviourTree::updateBlackboard() {}
-}  // namespace ArborMaster
+TreeNode& BehaviourTree::getRoot()
+{
+  return *m_root;
+}
+const Blackboard& BehaviourTree::getBlackboard()
+{
+  return m_blackboard;
+}
+}

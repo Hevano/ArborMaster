@@ -8,6 +8,8 @@ project(ArborMasterTests LANGUAGES CXX)
 # ---- Tests ----
 set(CMAKE_CXX_STANDARD 14)
 
+set(cxx_strict_flags "/W0")
+
 add_compile_options(
     /W0
 )
@@ -24,8 +26,10 @@ FetchContent_MakeAvailable(googletest)
 
 enable_testing()
 
-add_executable(ArborMaster_test source/ArborMaster_test.cpp)
-target_link_libraries(ArborMaster_test PRIVATE GTest::gtest_main)
+file (GLOB test_sources "./source/*.h")
+
+add_executable(ArborMaster_test source/ArborMaster_test.cpp ${test_sources} )
+target_link_libraries(ArborMaster_test PRIVATE ArborMaster_lib GTest::gtest_main)
 target_compile_features(ArborMaster_test PRIVATE 
 	cxx_std_20
 )

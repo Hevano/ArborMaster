@@ -38,6 +38,7 @@ file (GLOB lib_sources  "./source/lib/*.cpp" "./source/lib/*.h")
 
 add_library(
     ArborMaster_lib OBJECT
+    source/lib.hpp
     source/lib.cpp
     ${lib_sources}
 )
@@ -50,7 +51,7 @@ target_include_directories(
 
 target_compile_features(ArborMaster_lib PUBLIC cxx_std_20)
 
-target_link_libraries(ArborMaster_lib PRIVATE glfw OpenGL::GL glad imgui)
+target_link_libraries(ArborMaster_lib PUBLIC glfw OpenGL::GL glad imgui)
 
 # ---- Declare executable ----
 
