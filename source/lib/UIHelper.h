@@ -24,6 +24,7 @@ private:
   void drawExportPopup(const Application& a);
   void drawImportPopup(const Application& a);
   void drawToolbar(const Application& a);
+  void drawTabs(const Application& a);
   void drawTree(const Application& a, const BehaviourTree& bt);
 };
 

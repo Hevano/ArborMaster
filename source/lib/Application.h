@@ -10,6 +10,13 @@
 #include "NodeImporter.h"
 #include "TreeExporter.h"
 
+#include "glad/glad.h"
+
+#include "GLFW/glfw3.h"
+
+#include "imgui_impl_opengl3.h"
+#include "imgui_impl_glfw.h"
+
 namespace ArborMaster
 {
   class Application
@@ -23,7 +30,12 @@ namespace ArborMaster
     TreeExporter m_exporter;
     UIHelper m_ui;
 
+    struct GLFWwindow* m_window;
+
+
   public:
+    Application();
+    ~Application();
     void run();
     void setSourcePath(const std::string& path);
     void importNodes();
