@@ -26,6 +26,7 @@ private:
   void drawToolbar(const Application& a);
   void drawTabs(const Application& a);
   void drawBlackboard(const Application& a);
+  void drawNode(const TreeNode& n);
   void drawNodeList(const Application& a);
   void drawTree(const Application& a, const BehaviourTree& bt);
 };

@@ -95,6 +95,26 @@ void UIHelper::drawBlackboard(const Application& a) {
       "eiusmod tempor incididunt ut labore et dolore magna aliqua. ");
   ImGui::End();
 }
+void UIHelper::drawNode(const TreeNode& n) {
+  ImGuiWindowFlags windowFlags = 0;
+  windowFlags |= ImGuiWindowFlags_NoMove;
+  windowFlags |= ImGuiWindowFlags_NoResize;
+  windowFlags |= ImGuiWindowFlags_MenuBar;
+  ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, 5.0f);
+  ImGui::BeginChild(n.name.c_str(), ImVec2(0, 100), true, windowFlags);
+  
+  if (ImGui::BeginMenuBar()) {
+    if (ImGui::BeginMenu(n.name.c_str())) {
+      
+      ImGui::EndMenu();
+    }
+    ImGui::EndMenuBar();
+  }
+  ImGui::TextWrapped(
+      std::string("Max children: " + std::to_string(n.childCap)).c_str());
+  ImGui::EndChild();
+  ImGui::PopStyleVar();
+}
 void UIHelper::drawNodeList(const Application& a) {
   ImGuiWindowFlags windowFlags = 0;
   windowFlags |= ImGuiWindowFlags_NoMove;
@@ -104,9 +124,10 @@ void UIHelper::drawNodeList(const Application& a) {
   ImGui::SetNextWindowSize(ImVec2(viewport->WorkSize.x * 0.15f, viewport->WorkSize.y * 0.8f - 30), ImGuiCond_Always);
   ImGui::SetNextWindowPos(ImVec2(viewport->WorkPos.x + viewport->WorkSize.x * 0.85f , viewport->WorkPos.y * 0.8f + 30), ImGuiCond_Always, ImVec2(0.0f, 0.0f));
   ImGui::Begin("Node List", nullptr, windowFlags);
-  ImGui::TextWrapped(
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do "
-      "eiusmod tempor incididunt ut labore et dolore magna aliqua. ");
+  TreeNode tn;
+  tn.childCap = 3;
+  tn.name = "Sample Node";
+  drawNode(tn);
   ImGui::End();
 }
 void UIHelper::drawTree(const Application& a, const BehaviourTree& bt) {}
