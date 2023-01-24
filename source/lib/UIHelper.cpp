@@ -2,19 +2,71 @@
 #include "Application.h"
 #include "BehaviourTree.h"
 #include "TreeNode.h"
+#include "misc/cpp/imgui_stdlib.h"
 
 namespace ArborMaster
 {
 void UIHelper::draw(const Application& a) {
+  
   drawToolbar(a);
+  //drawImportPopup(a);
   drawTabs(a);
   drawNodeList(a);
   drawBlackboard(a);
 }
-void UIHelper::adjustTreeLayout(const TreeNode& root) {}
-void UIHelper::drawExportPopup(const Application& a) {}
-void UIHelper::drawImportPopup(const Application& a) {}
-void UIHelper::drawToolbar(const Application& a) {
+void UIHelper::drawExportPopup(const Application& a)
+{
+  // Always center this window when appearing
+  ImVec2 center = ImGui::GetMainViewport()->GetCenter();
+  ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
+  ImGui::OpenPopup("Tree Export");
+  if (ImGui::BeginPopupModal("Tree Export", NULL, ImGuiWindowFlags_AlwaysAutoResize))
+  {
+    ImGui::Text("Tree Designs will be available in you're client code.\n\n");
+    ImGui::Separator();
+    ImGui::SetItemDefaultFocus();
+    std::string path;
+    ImGui::InputText("Export path", &path);
+
+    if (ImGui::Button("OK", ImVec2(120, 0))) {
+      ImGui::CloseCurrentPopup();
+    }
+    ImGui::SameLine();
+    if (ImGui::Button("Cancel", ImVec2(120, 0))) {
+      ImGui::CloseCurrentPopup();
+    }
+    ImGui::EndPopup();
+  }
+}
+void UIHelper::drawImportPopup(const Application& a) {
+  // Always center this window when appearing
+  ImVec2 center = ImGui::GetMainViewport()->GetCenter();
+  ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
+  ImGui::OpenPopup("Node Import");
+  if (ImGui::BeginPopupModal(
+          "Node Import", NULL, ImGuiWindowFlags_AlwaysAutoResize))
+  {
+    ImGui::Text("Extracts node definitions from source code.\n\n");
+    ImGui::Separator();
+    ImGui::SetItemDefaultFocus();
+    std::string path;
+    ImGui::InputText("Import path", &path);
+
+    if (ImGui::Button("OK", ImVec2(120, 0))) {
+      ImGui::CloseCurrentPopup();
+    }
+    ImGui::SameLine();
+    if (ImGui::Button("Cancel", ImVec2(120, 0))) {
+      ImGui::CloseCurrentPopup();
+    }
+    ImGui::EndPopup();
+  }
+}
+void UIHelper::drawWorkSurface(const Application& a) {
+
+}
+void UIHelper::drawToolbar(const Application& a)
+{
   if (ImGui::BeginMainMenuBar()) {
     if (ImGui::BeginMenu("File")) {
       if (ImGui::MenuItem("New", "CTRL+N")) {
@@ -26,7 +78,10 @@ void UIHelper::drawToolbar(const Application& a) {
       }
       if (ImGui::MenuItem("Save As", "CTRL+SHIFT+S")) {
       }
-      
+      ImGui::Separator();
+      if (ImGui::MenuItem("Export", "CTRL+E")) {
+        ImGui::OpenPopup("Tree Export");
+      }
       ImGui::EndMenu();
     }
     if (ImGui::BeginMenu("Edit")) {
@@ -95,20 +150,29 @@ void UIHelper::drawBlackboard(const Application& a) {
       "eiusmod tempor incididunt ut labore et dolore magna aliqua. ");
   ImGui::End();
 }
-void UIHelper::drawNode(const TreeNode& n) {
+void UIHelper::drawNode(const TreeNode& n, bool draggable) {
   ImGuiWindowFlags windowFlags = 0;
   windowFlags |= ImGuiWindowFlags_NoMove;
   windowFlags |= ImGuiWindowFlags_NoResize;
-  windowFlags |= ImGuiWindowFlags_MenuBar;
   ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, 5.0f);
-  ImGui::BeginChild(n.name.c_str(), ImVec2(0, 100), true, windowFlags);
-  
-  if (ImGui::BeginMenuBar()) {
-    if (ImGui::BeginMenu(n.name.c_str())) {
-      
-      ImGui::EndMenu();
-    }
-    ImGui::EndMenuBar();
+  ImGui::BeginChild(n.name.c_str(), ImVec2(200, 100), true, windowFlags);
+  // Our buttons are both drag sources and drag targets here!
+  if (draggable && ImGui::BeginDragDropSource(ImGuiDragDropFlags_None)) {
+    // Set payload to carry the index of our item (could be anything)
+    ImGui::SetDragDropPayload("DND_DEMO_CELL", &n, sizeof(TreeNode));
+    drawNode(n, false);
+    ImGui::EndDragDropSource();
+  }
+  ImGui::TextWrapped(n.name.c_str());
+  std::string s(std::to_string(ImGui::IsItemClicked()));
+  ImGui::TextWrapped(s.c_str());
+  if (ImGui::IsItemActive()) {
+    ImGui::TextWrapped(std::to_string(ImGui::IsMouseDragging(0)).c_str());
+  }
+  ImGui::Separator();
+  ImGui::TextWrapped("Blackboard Data: ");
+  for (const auto& key : n.blackboardKeys) {
+    ImGui::BulletText(key.c_str());
   }
   ImGui::TextWrapped(
       std::string("Max children: " + std::to_string(n.childCap)).c_str());
@@ -127,10 +191,15 @@ void UIHelper::drawNodeList(const Application& a) {
   TreeNode tn;
   tn.childCap = 3;
   tn.name = "Sample Node";
-  drawNode(tn);
+  tn.blackboardKeys.emplace("key1");
+  drawNode(tn, true);
   ImGui::End();
 }
-void UIHelper::drawTree(const Application& a, const BehaviourTree& bt) {}
+void UIHelper::drawTree(const Application& a, const BehaviourTree& bt) {
+    
+}
+
+void UIHelper::adjustTreeLayout(const TreeNode& root) {}
 }
 
 

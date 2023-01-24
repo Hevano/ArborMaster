@@ -23,10 +23,13 @@ public:
 private:
   void drawExportPopup(const Application& a);
   void drawImportPopup(const Application& a);
+
+  void drawWorkSurface(const Application& a);
   void drawToolbar(const Application& a);
   void drawTabs(const Application& a);
   void drawBlackboard(const Application& a);
-  void drawNode(const TreeNode& n);
+
+  void drawNode(const TreeNode& n, bool draggable = false);
   void drawNodeList(const Application& a);
   void drawTree(const Application& a, const BehaviourTree& bt);
 };
