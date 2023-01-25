@@ -31,7 +31,9 @@ private:
 
   void drawNode(const TreeNode& n, bool draggable = false);
   void drawNodeList(const Application& a);
-  void drawTree(const Application& a, const BehaviourTree& bt);
+  int getSubTreeWidth(const TreeNode& root);
+  void drawTree(BehaviourTree& bt);
+  void drawTree(TreeNode& n);
 };
 
 }

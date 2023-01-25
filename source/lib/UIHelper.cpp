@@ -4,6 +4,8 @@
 #include "TreeNode.h"
 #include "misc/cpp/imgui_stdlib.h"
 
+#include <format>
+
 namespace ArborMaster
 {
 void UIHelper::draw(const Application& a) {
@@ -145,9 +147,21 @@ void UIHelper::drawBlackboard(const Application& a) {
   ImGui::SetNextWindowSize(ImVec2(viewport->WorkSize.x, viewport->WorkSize.y * 0.2f), ImGuiCond_Always);
   ImGui::SetNextWindowPos(ImVec2(viewport->WorkPos.x, viewport->WorkPos.y + viewport->WorkSize.y * 0.8f), ImGuiCond_Always, ImVec2(0.0f, 0.0f));
   ImGui::Begin("Blackboard", nullptr, windowFlags);
-  ImGui::TextWrapped(
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do "
-      "eiusmod tempor incididunt ut labore et dolore magna aliqua. ");
+  int buttons_count = 20;
+  float window_visible_x2 =
+      ImGui::GetWindowPos().x + ImGui::GetWindowContentRegionMax().x;
+  ImVec2 itemSize(200, 20);
+  auto& style = ImGui::GetStyle();
+  for (int n = 0; n < buttons_count; n++) {
+    ImGui::PushID(n);
+    ImGui::BulletText(std::format("key: {}", n).c_str(), itemSize);
+    float last_button_x2 = ImGui::GetItemRectMax().x;
+    float next_button_x2 = last_button_x2 + style.ItemSpacing.x
+        + itemSize.x;  // Expected position if next button was on same line
+    if (n + 1 < buttons_count && next_button_x2 < window_visible_x2)
+      ImGui::SameLine();
+    ImGui::PopID();
+  }
   ImGui::End();
 }
 void UIHelper::drawNode(const TreeNode& n, bool draggable) {
@@ -195,11 +209,26 @@ void UIHelper::drawNodeList(const Application& a) {
   drawNode(tn, true);
   ImGui::End();
 }
-void UIHelper::drawTree(const Application& a, const BehaviourTree& bt) {
-    
+int UIHelper::getSubTreeWidth(const TreeNode& root) {
+  int width = 0;
+  for (auto& child : root.children) {
+    width += getSubTreeWidth(*child);
+  }
+  return width;
+}
+void UIHelper::drawTree(BehaviourTree& bt) {
+  drawTree(bt.getRoot());
 }
 
-void UIHelper::adjustTreeLayout(const TreeNode& root) {}
+//Draws each node in the tree and the 
+void UIHelper::drawTree(TreeNode& n) {
+}
+
+//Sets the position of the nodes to create a evenly spaced tree layout
+void UIHelper::adjustTreeLayout(const TreeNode& root) {
+  //Assemble all nodes in a single line, with children equally to the left and right
+  // 
+}
 }
 
 
