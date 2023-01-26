@@ -8,10 +8,11 @@
 
 namespace ArborMaster
 {
+
+
 void UIHelper::draw(const Application& a) {
   
   drawToolbar(a);
-  //drawImportPopup(a);
   drawTabs(a);
   drawNodeList(a);
   drawBlackboard(a);
@@ -21,7 +22,6 @@ void UIHelper::drawExportPopup(const Application& a)
   // Always center this window when appearing
   ImVec2 center = ImGui::GetMainViewport()->GetCenter();
   ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
-  ImGui::OpenPopup("Tree Export");
   if (ImGui::BeginPopupModal("Tree Export", NULL, ImGuiWindowFlags_AlwaysAutoResize))
   {
     ImGui::Text("Tree Designs will be available in you're client code.\n\n");
@@ -44,7 +44,6 @@ void UIHelper::drawImportPopup(const Application& a) {
   // Always center this window when appearing
   ImVec2 center = ImGui::GetMainViewport()->GetCenter();
   ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
-  ImGui::OpenPopup("Node Import");
   if (ImGui::BeginPopupModal(
           "Node Import", NULL, ImGuiWindowFlags_AlwaysAutoResize))
   {
@@ -64,25 +63,97 @@ void UIHelper::drawImportPopup(const Application& a) {
     ImGui::EndPopup();
   }
 }
+void UIHelper::drawNewPopup(const Application& a) {
+  ImVec2 center = ImGui::GetMainViewport()->GetCenter();
+  ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
+  if (ImGui::BeginPopupModal(
+          NEW_POPUP_NAME.c_str(), NULL, ImGuiWindowFlags_AlwaysAutoResize))
+  {
+    ImGui::Text("Start designing with an empty tree.\n\n");
+    ImGui::Separator();
+    ImGui::SetItemDefaultFocus();
+
+    if (ImGui::Button("OK", ImVec2(120, 0))) {
+      ImGui::CloseCurrentPopup();
+    }
+    ImGui::SameLine();
+    if (ImGui::Button("Cancel", ImVec2(120, 0))) {
+      ImGui::CloseCurrentPopup();
+    }
+    ImGui::EndPopup();
+  }
+}
+void UIHelper::drawSaveAsPopup(const Application& a) {
+  ImVec2 center = ImGui::GetMainViewport()->GetCenter();
+  ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
+  if (ImGui::BeginPopupModal(
+          SAVE_AS_POPUP_NAME.c_str(), NULL, ImGuiWindowFlags_AlwaysAutoResize))
+  {
+    ImGui::Text("Save design at path\n\n");
+    ImGui::Separator();
+    ImGui::SetItemDefaultFocus();
+    std::string path;
+    ImGui::InputText("File Path", &path);
+
+    if (ImGui::Button("OK", ImVec2(120, 0))) {
+      ImGui::CloseCurrentPopup();
+    }
+    ImGui::SameLine();
+    if (ImGui::Button("Cancel", ImVec2(120, 0))) {
+      ImGui::CloseCurrentPopup();
+    }
+    ImGui::EndPopup();
+  }
+}
+void UIHelper::drawOpenPopup(const Application& a) {
+  ImVec2 center = ImGui::GetMainViewport()->GetCenter();
+  ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
+  if (ImGui::BeginPopupModal(
+          OPEN_POPUP_NAME.c_str(), NULL, ImGuiWindowFlags_AlwaysAutoResize))
+  {
+    ImGui::Text("Open and edit an existing tree design.\n\n");
+    ImGui::Separator();
+    ImGui::SetItemDefaultFocus();
+    std::string path;
+    ImGui::InputText("File path", &path);
+
+    if (ImGui::Button("Open", ImVec2(120, 0))) {
+      ImGui::CloseCurrentPopup();
+    }
+    ImGui::SameLine();
+    if (ImGui::Button("Cancel", ImVec2(120, 0))) {
+      ImGui::CloseCurrentPopup();
+    }
+    ImGui::EndPopup();
+  }
+}
 void UIHelper::drawWorkSurface(const Application& a) {
 
 }
 void UIHelper::drawToolbar(const Application& a)
 {
+  auto toolbarAction = ToolBarActions::None;
   if (ImGui::BeginMainMenuBar()) {
     if (ImGui::BeginMenu("File")) {
       if (ImGui::MenuItem("New", "CTRL+N")) {
+        toolbarAction = ToolBarActions::New;
       }
       if (ImGui::MenuItem("Open", "CTRL+O")) {
+        toolbarAction = ToolBarActions::Open;
       }
       ImGui::Separator();
       if (ImGui::MenuItem("Save", "CTRL+S")) {
+        toolbarAction = ToolBarActions::Save;
       }
       if (ImGui::MenuItem("Save As", "CTRL+SHIFT+S")) {
+        toolbarAction = ToolBarActions::SaveAs;
       }
       ImGui::Separator();
       if (ImGui::MenuItem("Export", "CTRL+E")) {
-        ImGui::OpenPopup("Tree Export");
+        toolbarAction = ToolBarActions::Export;
+      }
+      if (ImGui::MenuItem("Import", "CTRL+I")) {
+        toolbarAction = ToolBarActions::Import;
       }
       ImGui::EndMenu();
     }
@@ -107,6 +178,34 @@ void UIHelper::drawToolbar(const Application& a)
     }
     ImGui::EndMainMenuBar();
   }
+  switch (toolbarAction) {
+    case ToolBarActions::Export:
+      ImGui::OpenPopup(EXPORT_POPUP_NAME.c_str());
+      break;
+    case ToolBarActions::Import:
+      ImGui::OpenPopup(IMPORT_POPUP_NAME.c_str());
+      break;
+    case ToolBarActions::Open:
+      ImGui::OpenPopup(OPEN_POPUP_NAME.c_str());
+      break;
+    case ToolBarActions::New:
+      ImGui::OpenPopup(NEW_POPUP_NAME.c_str());
+      break;
+    case ToolBarActions::Save:
+      ImGui::OpenPopup(SAVE_AS_POPUP_NAME.c_str());
+      break;
+    case ToolBarActions::SaveAs:
+      ImGui::OpenPopup(SAVE_AS_POPUP_NAME.c_str());
+      break;
+    default:
+      break;
+  }
+    
+  drawExportPopup(a);
+  drawImportPopup(a);
+  drawNewPopup(a);
+  drawOpenPopup(a);
+  drawSaveAsPopup(a);
 }
 void UIHelper::drawTabs(const Application& a) {
   ImGuiWindowFlags windowFlags = 0;
