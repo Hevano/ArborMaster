@@ -6,6 +6,7 @@
 
 
 #include <format>
+#include <utility>
 
 
 namespace ArborMaster
@@ -13,27 +14,33 @@ namespace ArborMaster
 
 
 void UIHelper::draw(const Application& a) {
+  BehaviourTree bt;
+  TreeNode child1, child2, child3;
+  child1.name = "child1";
+  child1.id = 1;
+  child1.blackboardKeys.emplace("key1");
+  child1.position.x = 100;
+  child1.position.y = 0;
 
-  const int hardcoded_node_id = 1;
-  ImGuiWindowFlags windowFlags = ImGuiWindowFlags_NoDecoration
-      | ImGuiWindowFlags_NoMove
-      | ImGuiWindowFlags_NoSavedSettings
-      | ImGuiWindowFlags_NoBringToFrontOnFocus;
-  ImGui::SetNextWindowPos(ImGui::GetMainViewport()->WorkPos);
-  ImGui::SetNextWindowSize(ImGui::GetMainViewport()->WorkSize);
-  ImGui::Begin("Node Editor", nullptr, windowFlags);
-  ImNodes::BeginNodeEditor();
+  child2.name = "child2";
+  child2.id = 2;
+  child2.blackboardKeys.emplace("key2");
+  child2.position.x = 100;
+  child2.position.y = 100;
+  child3.name = "child3";
+  child2.id = 2;
+  child3.blackboardKeys.emplace("key3");
+  child3.position.x = 100;
+  child3.position.y = 200;
+  bt.getRoot().name = "root";
+  bt.getRoot().childCap = 4;
+  bt.getRoot().blackboardKeys.emplace("key0");
+  bt.getRoot().insertChild(child1, 0);
+  bt.getRoot().insertChild(child2, 1);
+  bt.getRoot().insertChild(child3, 2);
 
-  ImNodes::BeginNode(hardcoded_node_id);
-  ImNodes::BeginNodeTitleBar();
-  ImNodes::EndNodeTitleBar();
-  ImGui::TextUnformatted("simple node :)");
-  ImGui::Dummy(ImVec2(80.0f, 45.0f));
-  ImNodes::EndNode();
+  drawTree(bt);
 
-  ImNodes::EndNodeEditor();
-  ImGui::End();
-  
   drawToolbar(a);
   drawTabs(a);
   drawNodeList(a);
@@ -338,11 +345,46 @@ int UIHelper::getSubTreeWidth(const TreeNode& root) {
   return width;
 }
 void UIHelper::drawTree(BehaviourTree& bt) {
-  drawTree(bt.getRoot());
+  ImGuiWindowFlags windowFlags = ImGuiWindowFlags_NoDecoration
+      | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoSavedSettings
+      | ImGuiWindowFlags_NoBringToFrontOnFocus;
+  ImGui::SetNextWindowPos(ImGui::GetMainViewport()->WorkPos);
+  ImGui::SetNextWindowSize(ImGui::GetMainViewport()->WorkSize);
+  ImGui::Begin("Node Editor", nullptr, windowFlags);
+  ImNodes::BeginNodeEditor();
+  std::pair<int, int> throwaway(0, 0);
+  drawTree(bt.getRoot(), throwaway, 30);
+  ImNodes::EndNodeEditor();
+  ImGui::End();
 }
 
-//Draws each node in the tree and the 
-void UIHelper::drawTree(TreeNode& n) {
+//Draws each node in the tree
+void UIHelper::drawTree(TreeNode& n, std::pair<int, int>& linkId, int id)
+{
+  ImNodes::BeginNode(n.id);
+
+  ImNodes::BeginNodeTitleBar();
+  ImGui::TextUnformatted(n.name.c_str());
+  ImNodes::EndNodeTitleBar();
+  
+  linkId.second = ++id;
+
+  ImNodes::BeginInputAttribute(linkId.second);
+  ImNodes::EndInputAttribute();
+
+  ImNodes::BeginOutputAttribute(++id);
+  ImGui::Text("children");
+  ImNodes::EndOutputAttribute();
+
+  std::pair<int, int> childLink(id, 0);
+
+  ImNodes::EndNode();
+  for (const auto& child : n.children) {
+    int linkId = ++id;
+    drawTree(*child, childLink, id);
+    ImNodes::SetNodeGridSpacePos(child->id, child->position);
+    ImNodes::Link(linkId, childLink.first, childLink.second);
+  }
 }
 
 //Sets the position of the nodes to create a evenly spaced tree layout

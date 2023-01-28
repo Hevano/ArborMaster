@@ -54,7 +54,7 @@ private:
   void drawNodeList(const Application& a);
   int getSubTreeWidth(const TreeNode& root);
   void drawTree(BehaviourTree& bt);
-  void drawTree(TreeNode& n);
+  void drawTree(TreeNode& n, std::pair<int, int>& linkId, int id = 0);
 };
 
 }
