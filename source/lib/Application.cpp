@@ -31,11 +31,13 @@ Application::Application() {
   ImGui::CreateContext();
   ImGui_ImplOpenGL3_Init("#version 330");
   ImGui_ImplGlfw_InitForOpenGL(m_window, true);
+  ImNodes::CreateContext();
 
 }
 Application::~Application() {
   ImGui_ImplGlfw_Shutdown();
   ImGui_ImplOpenGL3_Shutdown();
+  ImNodes::DestroyContext();
   ImGui::DestroyContext();
   glfwDestroyWindow(m_window);
   glfwTerminate();

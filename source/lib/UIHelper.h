@@ -4,6 +4,7 @@
 #include "imgui_impl_glfw.h"
 
 #include <string>
+#include <memory>
 
 namespace ArborMaster
 {

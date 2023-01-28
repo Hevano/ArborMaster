@@ -51,7 +51,7 @@ target_include_directories(
 
 target_compile_features(ArborMaster_lib PUBLIC cxx_std_20)
 
-target_link_libraries(ArborMaster_lib PUBLIC glfw OpenGL::GL glad imgui)
+target_link_libraries(ArborMaster_lib PUBLIC glfw OpenGL::GL glad imgui imnodes)
 
 # ---- Declare executable ----
 

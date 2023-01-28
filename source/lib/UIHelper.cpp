@@ -4,13 +4,35 @@
 #include "TreeNode.h"
 #include "misc/cpp/imgui_stdlib.h"
 
+
 #include <format>
+
 
 namespace ArborMaster
 {
 
 
 void UIHelper::draw(const Application& a) {
+
+  const int hardcoded_node_id = 1;
+  ImGuiWindowFlags windowFlags = ImGuiWindowFlags_NoDecoration
+      | ImGuiWindowFlags_NoMove
+      | ImGuiWindowFlags_NoSavedSettings
+      | ImGuiWindowFlags_NoBringToFrontOnFocus;
+  ImGui::SetNextWindowPos(ImGui::GetMainViewport()->WorkPos);
+  ImGui::SetNextWindowSize(ImGui::GetMainViewport()->WorkSize);
+  ImGui::Begin("Node Editor", nullptr, windowFlags);
+  ImNodes::BeginNodeEditor();
+
+  ImNodes::BeginNode(hardcoded_node_id);
+  ImNodes::BeginNodeTitleBar();
+  ImNodes::EndNodeTitleBar();
+  ImGui::TextUnformatted("simple node :)");
+  ImGui::Dummy(ImVec2(80.0f, 45.0f));
+  ImNodes::EndNode();
+
+  ImNodes::EndNodeEditor();
+  ImGui::End();
   
   drawToolbar(a);
   drawTabs(a);
