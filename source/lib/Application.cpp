@@ -33,6 +33,8 @@ Application::Application() {
   ImGui_ImplGlfw_InitForOpenGL(m_window, true);
   ImNodes::CreateContext();
 
+  importNodes();
+  m_ui.loadEditorTree(*this);
 }
 Application::~Application() {
   ImGui_ImplGlfw_Shutdown();
@@ -62,7 +64,13 @@ void Application::run() {
   }
 }
 void Application::setSourcePath(const std::string& path) {}
-void Application::importNodes() {}
+void Application::importNodes() {
+  m_importer.setPath(
+      "C:\\Users\\Evano\\source\\repos\\ArborMaster\\test\\assets\\NodeDefTest."
+      "cpp");
+
+  m_importer.importAll(m_nf.getNodes());
+}
 void Application::exportTree() {}
 void Application::saveTree() {}
 void Application::newTree() {}

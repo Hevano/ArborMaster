@@ -6,5 +6,8 @@ TreeNode NodeFactory::createNode(const std::string& nodeName) const
 {
   return TreeNode();
 }
-void NodeFactory::defineNode(const TreeNode& n) {}
-}  // namespace ArborMaster
+std::unordered_map<std::string, TreeNode>& NodeFactory::getNodes()
+{
+  return m_nodes;
+}
+}

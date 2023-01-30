@@ -4,19 +4,14 @@
 #include <memory>
 #include <unordered_set>
 
-#include <imgui_impl_opengl3.h>
-#include <imgui_impl_glfw.h>
-
 namespace ArborMaster
 {
 class TreeNode
 {
 public:
   std::string name;
-  ImVec2 position;
   std::vector<std::shared_ptr<TreeNode>> children;
   int childCap;
-  int id;
   std::unordered_set<std::string> blackboardKeys;
 
 public:

@@ -9,11 +9,10 @@ namespace ArborMaster
   {
   private:
     std::unordered_map<std::string, TreeNode> m_nodes;
-
   public:
     //TODO: Consider move semantics
     TreeNode createNode(const std::string& nodeName) const;
-    void defineNode(const TreeNode& n);
+    std::unordered_map<std::string, TreeNode>& getNodes();
   };
 };
 

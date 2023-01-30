@@ -2,7 +2,10 @@
 #include "Application.h"
 #include "BehaviourTree.h"
 #include "TreeNode.h"
+#include "EditorNode.h"
 #include "misc/cpp/imgui_stdlib.h"
+#include "imgui_internal.h"
+#include "imnodes_internal.h"
 
 
 #include <format>
@@ -11,36 +14,10 @@
 
 namespace ArborMaster
 {
+void UIHelper::draw(Application& a)
+{
 
-
-void UIHelper::draw(const Application& a) {
-  BehaviourTree bt;
-  TreeNode child1, child2, child3;
-  child1.name = "child1";
-  child1.id = 1;
-  child1.blackboardKeys.emplace("key1");
-  child1.position.x = 100;
-  child1.position.y = 0;
-
-  child2.name = "child2";
-  child2.id = 2;
-  child2.blackboardKeys.emplace("key2");
-  child2.position.x = 100;
-  child2.position.y = 100;
-  child3.name = "child3";
-  child2.id = 2;
-  child3.blackboardKeys.emplace("key3");
-  child3.position.x = 100;
-  child3.position.y = 200;
-  bt.getRoot().name = "root";
-  bt.getRoot().childCap = 4;
-  bt.getRoot().blackboardKeys.emplace("key0");
-  bt.getRoot().insertChild(child1, 0);
-  bt.getRoot().insertChild(child2, 1);
-  bt.getRoot().insertChild(child3, 2);
-
-  drawTree(bt);
-
+  drawEditorTree(a);
   drawToolbar(a);
   drawTabs(a);
   drawNodeList(a);
@@ -301,13 +278,11 @@ void UIHelper::drawNode(const TreeNode& n, bool draggable) {
   // Our buttons are both drag sources and drag targets here!
   if (draggable && ImGui::BeginDragDropSource(ImGuiDragDropFlags_None)) {
     // Set payload to carry the index of our item (could be anything)
-    ImGui::SetDragDropPayload("DND_DEMO_CELL", &n, sizeof(TreeNode));
+    ImGui::SetDragDropPayload("DND_DEMO_CELL", &n.name, sizeof(std::string));
     drawNode(n, false);
     ImGui::EndDragDropSource();
   }
   ImGui::TextWrapped(n.name.c_str());
-  std::string s(std::to_string(ImGui::IsItemClicked()));
-  ImGui::TextWrapped(s.c_str());
   if (ImGui::IsItemActive()) {
     ImGui::TextWrapped(std::to_string(ImGui::IsMouseDragging(0)).c_str());
   }
@@ -321,7 +296,7 @@ void UIHelper::drawNode(const TreeNode& n, bool draggable) {
   ImGui::EndChild();
   ImGui::PopStyleVar();
 }
-void UIHelper::drawNodeList(const Application& a) {
+void UIHelper::drawNodeList(Application& a) {
   ImGuiWindowFlags windowFlags = 0;
   windowFlags |= ImGuiWindowFlags_NoMove;
   windowFlags |= ImGuiWindowFlags_NoResize;
@@ -330,21 +305,21 @@ void UIHelper::drawNodeList(const Application& a) {
   ImGui::SetNextWindowSize(ImVec2(viewport->WorkSize.x * 0.15f, viewport->WorkSize.y * 0.8f - 30), ImGuiCond_Always);
   ImGui::SetNextWindowPos(ImVec2(viewport->WorkPos.x + viewport->WorkSize.x * 0.85f , viewport->WorkPos.y * 0.8f + 30), ImGuiCond_Always, ImVec2(0.0f, 0.0f));
   ImGui::Begin("Node List", nullptr, windowFlags);
-  TreeNode tn;
-  tn.childCap = 3;
-  tn.name = "Sample Node";
-  tn.blackboardKeys.emplace("key1");
-  drawNode(tn, true);
+  for (auto& [name, node] : a.m_nf.getNodes()) {
+    drawNode(node, true);
+  }
+  
   ImGui::End();
 }
-int UIHelper::getSubTreeWidth(const TreeNode& root) {
-  int width = 0;
-  for (auto& child : root.children) {
-    width += getSubTreeWidth(*child);
+
+void UIHelper::loadEditorTree(Application& a) {
+  for (const auto& [name, node] : a.m_nf.getNodes()) {
+    m_editorNodes.emplace(++m_editorId, EditorNode(node, ImVec2(), m_editorId));
   }
-  return width;
 }
-void UIHelper::drawTree(BehaviourTree& bt) {
+
+void UIHelper::drawEditorTree(Application& a)
+{
   ImGuiWindowFlags windowFlags = ImGuiWindowFlags_NoDecoration
       | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoSavedSettings
       | ImGuiWindowFlags_NoBringToFrontOnFocus;
@@ -352,45 +327,80 @@ void UIHelper::drawTree(BehaviourTree& bt) {
   ImGui::SetNextWindowSize(ImGui::GetMainViewport()->WorkSize);
   ImGui::Begin("Node Editor", nullptr, windowFlags);
   ImNodes::BeginNodeEditor();
-  std::pair<int, int> throwaway(0, 0);
-  drawTree(bt.getRoot(), throwaway, 30);
-  ImNodes::EndNodeEditor();
-  ImGui::End();
-}
+  if (ImGui::GetCurrentContext()->DragDropActive) {
+    ImGui::InvisibleButton("##canvas", ImGui::GetWindowSize());
+    if (ImGui::BeginDragDropTarget()) {
+      if (const ImGuiPayload* payload =
+              ImGui::AcceptDragDropPayload("DND_DEMO_CELL"))
+      {
+        IM_ASSERT(payload->DataSize == sizeof(std::string));
+        std::string droppedTree = *(const std::string*)payload->Data;
+        m_editorNodes.emplace(++m_editorId, EditorNode(a.m_nf.getNodes()[droppedTree], ImGui::GetMousePos(), m_editorId));
+        ImNodes::SetNodeScreenSpacePos(m_editorId, ImGui::GetMousePos());
+        ImNodes::SnapNodeToGrid(m_editorId);
+      }
+      ImGui::EndDragDropTarget();
+    }
+  }
 
-//Draws each node in the tree
-void UIHelper::drawTree(TreeNode& n, std::pair<int, int>& linkId, int id)
-{
-  ImNodes::BeginNode(n.id);
+  ImNodes::PushColorStyle(ImNodesCol_TitleBar, IM_COL32(255, 0, 0, 255));
+  ImNodes::PushColorStyle(ImNodesCol_TitleBarSelected, IM_COL32(255, 20, 20, 255));
+
+  //Draw Root Node
+  ImNodes::BeginNode(1);
 
   ImNodes::BeginNodeTitleBar();
-  ImGui::TextUnformatted(n.name.c_str());
+  ImGui::TextUnformatted("root");
   ImNodes::EndNodeTitleBar();
-  
-  linkId.second = ++id;
 
-  ImNodes::BeginInputAttribute(linkId.second);
-  ImNodes::EndInputAttribute();
-
-  ImNodes::BeginOutputAttribute(++id);
-  ImGui::Text("children");
+  ImNodes::BeginOutputAttribute(1 << 8);
   ImNodes::EndOutputAttribute();
-
-  std::pair<int, int> childLink(id, 0);
-
   ImNodes::EndNode();
-  for (const auto& child : n.children) {
-    int linkId = ++id;
-    drawTree(*child, childLink, id);
-    ImNodes::SetNodeGridSpacePos(child->id, child->position);
-    ImNodes::Link(linkId, childLink.first, childLink.second);
-  }
-}
 
-//Sets the position of the nodes to create a evenly spaced tree layout
-void UIHelper::adjustTreeLayout(const TreeNode& root) {
-  //Assemble all nodes in a single line, with children equally to the left and right
-  // 
+  ImNodes::PopColorStyle();
+  ImNodes::PopColorStyle();
+  
+  //Draw all nodes
+  for (auto& [id, editorNode] : m_editorNodes) {
+    ImNodes::BeginNode(id);
+
+    ImNodes::BeginNodeTitleBar();
+    ImGui::TextUnformatted(editorNode.treeNode.name.c_str());
+    ImNodes::EndNodeTitleBar();
+
+    ImNodes::BeginInputAttribute(id << 8);
+    ImNodes::EndInputAttribute();
+
+    ImNodes::BeginOutputAttribute(id << 16);
+    ImGui::Text("children");
+    ImNodes::EndOutputAttribute();
+    ImNodes::EndNode();
+  }
+
+  //Draw all links
+  for (const auto& [id, editorLink] : m_editorLinks) {
+    ImNodes::Link(id, editorLink.startId, editorLink.endId);
+  }
+
+  ImNodes::EndNodeEditor();
+  ImGui::End();
+
+  //Add new links
+  EditorLink link;
+  if (ImNodes::IsLinkCreated(&link.startId, &link.endId)) {
+    link.id = ++m_editorId;
+    m_editorLinks[link.id] = link;
+  }
+
+  //Remove existing links
+  int link_id;
+  if (ImNodes::IsLinkDestroyed(&link_id)) {
+    if (m_editorLinks.count(link_id) != 1) {
+      throw std::exception("Tried to remove link not in map");
+    }
+    m_editorLinks.erase(link_id);
+  }
+
 }
 }
 

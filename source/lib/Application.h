@@ -3,12 +3,13 @@
 #include "AIActor.h"
 #include "NodeFactory.h"
 #include "UIHelper.h"
-
+#include "NodeImporter.h"
+#include "TreeExporter.h"
+#include "EditorNode.h"
 
 #include <unordered_map>
 #include <string>
-#include "NodeImporter.h"
-#include "TreeExporter.h"
+#include <vector>
 
 #include "glad/glad.h"
 
@@ -31,6 +32,7 @@ namespace ArborMaster
     NodeImporter m_importer;
     TreeExporter m_exporter;
     UIHelper m_ui;
+    std::vector<EditorNode> m_editorNodes;
 
     struct GLFWwindow* m_window;
 

@@ -13,8 +13,8 @@ protected:
   { 
 	  TreeNode t;
     t.name = "node1";
-	t.childCap = 1;
-	  nf.defineNode(t);
+	  t.childCap = 1;
+	  //nf.defineNode(t);
   }
 
   void TearDown() override {}
