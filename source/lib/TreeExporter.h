@@ -1,10 +1,14 @@
 #pragma once
 #include "BehaviourTree.h"
 
+#include <nlohmann/json.hpp>
+
 #include <string>
 #include <unordered_map>
 
 namespace ArborMaster {
+
+using json = nlohmann::json;
 
 class EditorLink;
 class EditorNode;
@@ -25,6 +29,10 @@ public:
 
   //Loads the design of the tree from path
   BehaviourTree loadDesign(const std::string& path);
+
+  private:
+  json traverseTree(int id, const std::unordered_map<int, std::vector<int>>& adjList, const std::unordered_map<int, EditorNode>& nodes) const;
+
 
 };
 }

@@ -57,7 +57,7 @@ target_compile_features(ArborMaster_lib PUBLIC cxx_std_20)
 
 target_link_libraries(ArborMaster_lib PUBLIC glfw OpenGL::GL glad imgui imnodes)
 
-target_link_libraries(ArborMaster_lib PRIVATE nlohmann_json::nlohmann_json)
+target_link_libraries(ArborMaster_lib PUBLIC nlohmann_json::nlohmann_json)
 
 
 # ---- Declare executable ----

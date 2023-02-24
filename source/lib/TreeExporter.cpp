@@ -3,8 +3,6 @@
 
 #include <nlohmann/json.hpp>
 
-#include <unordered_set>
-
 #include <fstream>
 
 namespace ArborMaster
@@ -20,22 +18,25 @@ void TreeExporter::exportTree(
     const std::unordered_map<int, EditorLink>& links,
     const std::unordered_map<int, EditorNode>& nodes) const
 {
-  using json = nlohmann::json;
 
-  json j;
+  std::unordered_map<int, std::vector<int>> adjList;
 
+  //Create Adjaceny list
   for (const auto& [id, link] : links) {
-    json node;
     int parentId = link.startId >> 16;
     int childId = link.endId >> 8;
-    node["id"] = childId;
-    node["parentId"] = parentId;
-    node["name"] = nodes.at(childId).treeNode.name;
-    j[std::to_string(childId)] = node;
+    adjList[parentId].push_back(childId);
+  }
+  
+  json tree;
+
+  for (auto childId : adjList.at(1))
+  {
+    tree["root"][std::to_string(childId)] = traverseTree(childId, adjList, nodes);
   }
 
   std::ofstream stream(m_path);
-  stream << std::setw(4) << j << std::endl;
+  stream << std::setw(4) << tree << std::endl;
   stream.close();
 }
 void TreeExporter::saveDesign(const BehaviourTree& bt, const std::string& path) const
@@ -44,5 +45,25 @@ void TreeExporter::saveDesign(const BehaviourTree& bt, const std::string& path) 
 BehaviourTree TreeExporter::loadDesign(const std::string& path)
 {
   return BehaviourTree();
+}
+json TreeExporter::traverseTree(
+    int id, 
+    const std::unordered_map<int, std::vector<int>>& adjList,
+    const std::unordered_map<int, EditorNode>& nodes) const
+{
+  json subtree;
+
+  subtree["id"] = id;
+  subtree["name"] = nodes.at(id).treeNode.name;
+
+  if (adjList.contains(id))
+  {
+    for (auto childId : adjList.at(id)) {
+    subtree["children"].push_back(traverseTree(childId, adjList, nodes));
+  }
+  }
+  
+
+  return subtree;
 }
 }  // namespace ArborMaster
