@@ -53,14 +53,14 @@ private:
 	Import
   };
 
-  void drawExportPopup(const Application& a);
+  void drawExportPopup(Application& a);
   void drawImportPopup(const Application& a);
   void drawNewPopup(const Application& a);
   void drawSaveAsPopup(const Application& a);
   void drawOpenPopup(const Application& a);
 
   void drawWorkSurface(const Application& a);
-  void drawToolbar(const Application& a);
+  void drawToolbar(Application& a);
   void drawTabs(const Application& a);
   void drawBlackboard(const Application& a);
 

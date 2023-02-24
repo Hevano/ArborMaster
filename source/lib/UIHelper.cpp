@@ -23,7 +23,7 @@ void UIHelper::draw(Application& a)
   drawNodeList(a);
   drawBlackboard(a);
 }
-void UIHelper::drawExportPopup(const Application& a)
+void UIHelper::drawExportPopup(Application& a)
 {
   // Always center this window when appearing
   ImVec2 center = ImGui::GetMainViewport()->GetCenter();
@@ -33,10 +33,13 @@ void UIHelper::drawExportPopup(const Application& a)
     ImGui::Text("Tree Designs will be available in you're client code.\n\n");
     ImGui::Separator();
     ImGui::SetItemDefaultFocus();
-    std::string path;
+    std::string path = a.m_exporter.getPath();
     ImGui::InputText("Export path", &path);
 
+    a.m_exporter.setPath(path);
+
     if (ImGui::Button("OK", ImVec2(120, 0))) {
+      a.m_exporter.exportTree(m_editorLinks, m_editorNodes);
       ImGui::CloseCurrentPopup();
     }
     ImGui::SameLine();
@@ -136,7 +139,7 @@ void UIHelper::drawOpenPopup(const Application& a) {
 void UIHelper::drawWorkSurface(const Application& a) {
 
 }
-void UIHelper::drawToolbar(const Application& a)
+void UIHelper::drawToolbar(Application& a)
 {
   auto toolbarAction = ToolBarActions::None;
   if (ImGui::BeginMainMenuBar()) {
@@ -313,9 +316,9 @@ void UIHelper::drawNodeList(Application& a) {
 }
 
 void UIHelper::loadEditorTree(Application& a) {
-  for (const auto& [name, node] : a.m_nf.getNodes()) {
+  /*for (const auto& [name, node] : a.m_nf.getNodes()) {
     m_editorNodes.emplace(++m_editorId, EditorNode(node, ImVec2(), m_editorId));
-  }
+  }*/
 }
 
 void UIHelper::drawEditorTree(Application& a)
@@ -335,9 +338,10 @@ void UIHelper::drawEditorTree(Application& a)
       {
         IM_ASSERT(payload->DataSize == sizeof(std::string));
         std::string droppedTree = *(const std::string*)payload->Data;
-        m_editorNodes.emplace(++m_editorId, EditorNode(a.m_nf.getNodes()[droppedTree], ImGui::GetMousePos(), m_editorId));
-        ImNodes::SetNodeScreenSpacePos(m_editorId, ImGui::GetMousePos());
-        ImNodes::SnapNodeToGrid(m_editorId);
+        int id = ++m_editorId;
+        m_editorNodes.emplace(id, EditorNode(a.m_nf.getNodes()[droppedTree], ImGui::GetMousePos(), id));
+        ImNodes::SetNodeScreenSpacePos(id, ImGui::GetMousePos());
+        ImNodes::SnapNodeToGrid(id);
       }
       ImGui::EndDragDropTarget();
     }
@@ -353,7 +357,7 @@ void UIHelper::drawEditorTree(Application& a)
   ImGui::TextUnformatted("root");
   ImNodes::EndNodeTitleBar();
 
-  ImNodes::BeginOutputAttribute(1 << 8);
+  ImNodes::BeginOutputAttribute(1 << 16);
   ImNodes::EndOutputAttribute();
   ImNodes::EndNode();
 

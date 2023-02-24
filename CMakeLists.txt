@@ -31,6 +31,10 @@ add_subdirectory(${PROJECT_SOURCE_DIR}/thirdparty/glfw3)
 
 include_directories(ArborMaster ${GLFW_INCLUDE_DIR})
 
+include(FetchContent)
+FetchContent_Declare(json URL https://github.com/nlohmann/json/releases/download/v3.11.2/json.tar.xz)
+FetchContent_MakeAvailable(json)
+
 
 # ---- Declare library ----
 
@@ -52,6 +56,9 @@ target_include_directories(
 target_compile_features(ArborMaster_lib PUBLIC cxx_std_20)
 
 target_link_libraries(ArborMaster_lib PUBLIC glfw OpenGL::GL glad imgui imnodes)
+
+target_link_libraries(ArborMaster_lib PRIVATE nlohmann_json::nlohmann_json)
+
 
 # ---- Declare executable ----
 
