@@ -22,7 +22,7 @@ public:
   const std::string& getPath() const;
   void setPath(const std::string& path);
   //Exports the tree to m_path for use in client code
-  void exportTree(const std::unordered_map<int, EditorLink>& links, const std::unordered_map<int, EditorNode>& nodes) const;
+  void exportTree(const std::unordered_map<int, std::vector<int>>& adjList, const std::unordered_map<int, EditorNode>& nodes) const;
 
   //saves the design of the tree to path in serialized json format
   void saveDesign(const BehaviourTree& bt, const std::string& path) const;

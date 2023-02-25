@@ -4,6 +4,7 @@
 #include <nlohmann/json.hpp>
 
 #include <fstream>
+#include <algorithm>
 
 namespace ArborMaster
 {
@@ -15,18 +16,9 @@ void TreeExporter::setPath(const std::string& path) {
   m_path = path;
 }
 void TreeExporter::exportTree(
-    const std::unordered_map<int, EditorLink>& links,
+    const std::unordered_map<int, std::vector<int>>& adjList,
     const std::unordered_map<int, EditorNode>& nodes) const
 {
-
-  std::unordered_map<int, std::vector<int>> adjList;
-
-  //Create Adjaceny list
-  for (const auto& [id, link] : links) {
-    int parentId = link.startId >> 16;
-    int childId = link.endId >> 8;
-    adjList[parentId].push_back(childId);
-  }
   
   json tree;
 

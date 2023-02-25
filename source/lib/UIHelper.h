@@ -35,6 +35,7 @@ private:
 
   std::unordered_map<int, EditorNode> m_editorNodes;
   std::unordered_map<int, EditorLink> m_editorLinks;
+  std::unordered_map<int, std::vector<int>> m_adjList;
 
 public:
   void draw(Application& a);

@@ -10,6 +10,7 @@
 
 #include <format>
 #include <utility>
+#include <unordered_set>
 
 
 namespace ArborMaster
@@ -39,7 +40,7 @@ void UIHelper::drawExportPopup(Application& a)
     a.m_exporter.setPath(path);
 
     if (ImGui::Button("OK", ImVec2(120, 0))) {
-      a.m_exporter.exportTree(m_editorLinks, m_editorNodes);
+      a.m_exporter.exportTree(m_adjList, m_editorNodes);
       ImGui::CloseCurrentPopup();
     }
     ImGui::SameLine();
@@ -363,22 +364,56 @@ void UIHelper::drawEditorTree(Application& a)
 
   ImNodes::PopColorStyle();
   ImNodes::PopColorStyle();
+
+  std::unordered_set<int> drawnNodes;
+
+  // Draw nodes connected to the tree
+  for (auto& [parentId, childList] : m_adjList) {
+    int childCount = 1;
+
+    std::sort(childList.begin(), childList.end(), [this](int i, int j) {
+      return m_editorNodes.at(i).position.y < m_editorNodes.at(j).position.y;
+    });
+
+    for (auto& childId : childList) {
+      ImNodes::BeginNode(childId);
+
+      ImNodes::BeginNodeTitleBar();
+      std::string title = "(" + std::to_string(childCount++) + ") " + m_editorNodes.at(childId).treeNode.name;
+      ImGui::TextUnformatted(title.c_str());
+      ImNodes::EndNodeTitleBar();
+
+      ImNodes::BeginInputAttribute(childId << 8);
+      ImNodes::EndInputAttribute();
+
+      ImNodes::BeginOutputAttribute(childId << 16);
+      ImGui::Text("children");
+      ImNodes::EndOutputAttribute();
+      ImNodes::EndNode();
+
+      m_editorNodes.at(childId).position = ImNodes::GetNodeGridSpacePos(childId);
+
+      drawnNodes.emplace(childId);
+    }
+  }
   
-  //Draw all nodes
+  //Draw remaining nodes
   for (auto& [id, editorNode] : m_editorNodes) {
-    ImNodes::BeginNode(id);
+    if (!drawnNodes.contains(id)) {
+      ImNodes::BeginNode(id);
 
-    ImNodes::BeginNodeTitleBar();
-    ImGui::TextUnformatted(editorNode.treeNode.name.c_str());
-    ImNodes::EndNodeTitleBar();
+      ImNodes::BeginNodeTitleBar();
+      ImGui::TextUnformatted(editorNode.treeNode.name.c_str());
+      ImNodes::EndNodeTitleBar();
 
-    ImNodes::BeginInputAttribute(id << 8);
-    ImNodes::EndInputAttribute();
+      ImNodes::BeginInputAttribute(id << 8);
+      ImNodes::EndInputAttribute();
 
-    ImNodes::BeginOutputAttribute(id << 16);
-    ImGui::Text("children");
-    ImNodes::EndOutputAttribute();
-    ImNodes::EndNode();
+      ImNodes::BeginOutputAttribute(id << 16);
+      ImGui::Text("children");
+      ImNodes::EndOutputAttribute();
+      ImNodes::EndNode();
+    }
   }
 
   //Draw all links
@@ -392,6 +427,9 @@ void UIHelper::drawEditorTree(Application& a)
   //Add new links
   EditorLink link;
   if (ImNodes::IsLinkCreated(&link.startId, &link.endId)) {
+    int parentId = link.startId >> 16;
+    int childId = link.endId >> 8;
+    m_adjList[parentId].push_back(childId);
     link.id = ++m_editorId;
     m_editorLinks[link.id] = link;
   }
