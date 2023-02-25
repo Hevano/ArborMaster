@@ -24,7 +24,7 @@ void TreeExporter::exportTree(
 
   for (auto childId : adjList.at(1))
   {
-    tree["root"][std::to_string(childId)] = traverseTree(childId, adjList, nodes);
+    tree["root"] = traverseTree(childId, adjList, nodes);
   }
 
   std::ofstream stream(m_path);
