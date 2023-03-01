@@ -46,7 +46,7 @@ json TreeExporter::traverseTree(
   json subtree;
 
   subtree["id"] = id;
-  subtree["name"] = nodes.at(id).treeNode.name;
+  subtree["name"] = nodes.at(id).treeNode->name;
 
   if (adjList.contains(id))
   {

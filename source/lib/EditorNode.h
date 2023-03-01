@@ -10,10 +10,12 @@ struct EditorNode
 {
   int id;
   ImVec2 position;
-  const TreeNode& treeNode;
+  TreeNode const* treeNode;
+
+  EditorNode() = default;
 
   EditorNode(const TreeNode& tn, ImVec2 pos, int id)
-      : treeNode(tn)
+      : treeNode(&tn)
       , position(pos)
       , id(id)
   {

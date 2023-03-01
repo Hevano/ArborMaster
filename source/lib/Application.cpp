@@ -32,6 +32,7 @@ Application::Application() {
   ImGui_ImplOpenGL3_Init("#version 330");
   ImGui_ImplGlfw_InitForOpenGL(m_window, true);
   ImNodes::CreateContext();
+  ImNodes::GetIO().LinkDetachWithModifierClick.Modifier = &ImGui::GetIO().KeyCtrl;
 
   importNodes();
   m_ui.loadEditorTree(*this);
@@ -65,9 +66,7 @@ void Application::run() {
 }
 void Application::setSourcePath(const std::string& path) {}
 void Application::importNodes() {
-  m_importer.setPath(
-      "C:\\Users\\Evano\\source\\repos\\ArborMaster\\test\\assets\\NodeDefTest."
-      "cpp");
+  m_importer.setPath("C:\\Users\\Evano\\source\\repos\\SaplingTactics\\source\\lib\\BehaviourNodes.h");
 
   m_importer.importAll(m_nf.getNodes());
 }

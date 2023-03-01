@@ -3,6 +3,7 @@
 #include <string>
 #include <memory>
 #include <unordered_map>
+#include <unordered_set>
 
 #include "imgui_impl_opengl3.h"
 #include "imgui_impl_glfw.h"
@@ -34,6 +35,7 @@ private:
   inline static const std::string SAVE_AS_POPUP_NAME = "Save As";
 
   std::unordered_map<int, EditorNode> m_editorNodes;
+  std::unordered_set<int> m_freeNodes;
   std::unordered_map<int, EditorLink> m_editorLinks;
   std::unordered_map<int, std::vector<int>> m_adjList;
 
@@ -68,6 +70,8 @@ private:
   void drawNode(const TreeNode& n, bool draggable = false);
   void drawNodeList(Application& a);
   void drawEditorTree(Application& a);
+  void deleteLink(EditorLink link);
+  void deleteEditorNode(EditorNode node);
 };
 
 }

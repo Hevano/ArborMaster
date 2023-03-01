@@ -341,6 +341,7 @@ void UIHelper::drawEditorTree(Application& a)
         std::string droppedTree = *(const std::string*)payload->Data;
         int id = ++m_editorId;
         m_editorNodes.emplace(id, EditorNode(a.m_nf.getNodes()[droppedTree], ImGui::GetMousePos(), id));
+        m_freeNodes.emplace(id);
         ImNodes::SetNodeScreenSpacePos(id, ImGui::GetMousePos());
         ImNodes::SnapNodeToGrid(id);
       }
@@ -365,8 +366,6 @@ void UIHelper::drawEditorTree(Application& a)
   ImNodes::PopColorStyle();
   ImNodes::PopColorStyle();
 
-  std::unordered_set<int> drawnNodes;
-
   // Draw nodes connected to the tree
   for (auto& [parentId, childList] : m_adjList) {
     int childCount = 1;
@@ -379,7 +378,7 @@ void UIHelper::drawEditorTree(Application& a)
       ImNodes::BeginNode(childId);
 
       ImNodes::BeginNodeTitleBar();
-      std::string title = "(" + std::to_string(childCount++) + ") " + m_editorNodes.at(childId).treeNode.name;
+      std::string title = "(" + std::to_string(childCount++) + ") " + m_editorNodes.at(childId).treeNode->name;
       ImGui::TextUnformatted(title.c_str());
       ImNodes::EndNodeTitleBar();
 
@@ -392,28 +391,25 @@ void UIHelper::drawEditorTree(Application& a)
       ImNodes::EndNode();
 
       m_editorNodes.at(childId).position = ImNodes::GetNodeGridSpacePos(childId);
-
-      drawnNodes.emplace(childId);
     }
   }
   
   //Draw remaining nodes
-  for (auto& [id, editorNode] : m_editorNodes) {
-    if (!drawnNodes.contains(id)) {
-      ImNodes::BeginNode(id);
+  for (auto id : m_freeNodes) {
+    auto editorNode = m_editorNodes[id];
+    ImNodes::BeginNode(id);
 
-      ImNodes::BeginNodeTitleBar();
-      ImGui::TextUnformatted(editorNode.treeNode.name.c_str());
-      ImNodes::EndNodeTitleBar();
+    ImNodes::BeginNodeTitleBar();
+    ImGui::TextUnformatted(editorNode.treeNode->name.c_str());
+    ImNodes::EndNodeTitleBar();
 
-      ImNodes::BeginInputAttribute(id << 8);
-      ImNodes::EndInputAttribute();
+    ImNodes::BeginInputAttribute(id << 8);
+    ImNodes::EndInputAttribute();
 
-      ImNodes::BeginOutputAttribute(id << 16);
-      ImGui::Text("children");
-      ImNodes::EndOutputAttribute();
-      ImNodes::EndNode();
-    }
+    ImNodes::BeginOutputAttribute(id << 16);
+    ImGui::Text("children");
+    ImNodes::EndOutputAttribute();
+    ImNodes::EndNode();
   }
 
   //Draw all links
@@ -429,9 +425,22 @@ void UIHelper::drawEditorTree(Application& a)
   if (ImNodes::IsLinkCreated(&link.startId, &link.endId)) {
     int parentId = link.startId >> 16;
     int childId = link.endId >> 8;
+
+    if (!m_freeNodes.contains(childId)) {
+      auto oldLinkIt = m_editorLinks.end();
+      for (auto existingLinkIt = m_editorLinks.begin(); existingLinkIt != m_editorLinks.end(); existingLinkIt++) {
+        if (existingLinkIt->second.endId >> 8 == childId) {
+          oldLinkIt = existingLinkIt;
+        }
+      }
+      if (oldLinkIt != m_editorLinks.end()) {
+        deleteLink(oldLinkIt->second);
+      }
+    }
     m_adjList[parentId].push_back(childId);
     link.id = ++m_editorId;
     m_editorLinks[link.id] = link;
+    m_freeNodes.erase(childId);
   }
 
   //Remove existing links
@@ -440,10 +449,58 @@ void UIHelper::drawEditorTree(Application& a)
     if (m_editorLinks.count(link_id) != 1) {
       throw std::exception("Tried to remove link not in map");
     }
-    m_editorLinks.erase(link_id);
+    deleteLink(m_editorLinks[link_id]);
+  }
+
+  // Delete nodes
+  int numSelected = ImNodes::NumSelectedNodes();
+  if (numSelected != 0 && ImGui::IsKeyPressed(ImGuiKey_Delete, false)) {
+    int *selectedIds = new int(numSelected);
+    ImNodes::GetSelectedNodes(selectedIds);
+    if (selectedIds != nullptr) {
+      for (int i = 0; i < numSelected; i++) {
+        deleteEditorNode(m_editorNodes[selectedIds[i]]);
+      }
+    }
   }
 
 }
+void UIHelper::deleteLink(EditorLink link) {
+  int parentId = link.startId >> 16;
+  int childId = link.endId >> 8;
+  for (auto& [p, childList] : m_adjList) {
+    if (p == parentId) {
+      auto it = std::find(childList.begin(), childList.end(), childId);
+      if (it != childList.end()) {
+        m_freeNodes.emplace(childId);
+        childList.erase(it);
+      }
+    }
+  }
+  m_editorLinks.erase(link.id);
+}
+
+void UIHelper::deleteEditorNode(EditorNode node) {
+  if (m_freeNodes.contains(node.id)) {
+    m_freeNodes.erase(node.id);
+  } else {
+    int parentId = -1;
+    int linkId = -1;
+    for (auto& [id, link] : m_editorLinks) {
+      if (link.endId >> 8 == node.id) {
+        linkId = link.id;
+        parentId = link.startId >> 16;
+      }
+    }
+    if (parentId != -1 && linkId != -1) {
+      auto it = std::find(m_adjList[parentId].begin(), m_adjList[parentId].end(), node.id);
+      m_adjList[parentId].erase(it);
+      m_editorLinks.erase(linkId);
+    }
+  }
+  m_editorNodes.erase(node.id);
+}
+
 }
 
 
