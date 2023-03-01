@@ -386,7 +386,11 @@ void UIHelper::drawEditorTree(Application& a)
       ImNodes::EndInputAttribute();
 
       ImNodes::BeginOutputAttribute(childId << 16);
-      ImGui::Text("children");
+      if(m_adjList[childId].size() > m_editorNodes.at(childId).treeNode->childCap) 
+        ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(255, 0, 0, 255));
+      ImGui::Text(std::format("children {}/{}", m_adjList[childId].size(), m_editorNodes.at(childId).treeNode->childCap).c_str());
+      if(m_adjList[childId].size() > m_editorNodes.at(childId).treeNode->childCap) 
+        ImGui::PopStyleColor();
       ImNodes::EndOutputAttribute();
       ImNodes::EndNode();
 
