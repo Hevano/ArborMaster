@@ -9,10 +9,33 @@
 
 void ArborMaster::EditorTree::updateBlackboard()
 {
+  m_blackboard.data.clear();
+  for (auto& [id, node] : m_editorNodes) {
+    updateBlackboard(*node.treeNode);
+  }
 }
 
 void ArborMaster::EditorTree::updateBlackboard(const TreeNode& node, bool added)
 {
+  if (added) {
+    for (const auto& key : node.blackboardKeys) {
+      m_blackboard.data.emplace(key);
+    }
+  }
+  else {
+    //Remove must be called after node is removed from editorNodes dict
+    std::unordered_set<std::string> toDelete(node.blackboardKeys);
+    for (const auto& [id, n] : m_editorNodes) {
+      for (const auto& key : n.treeNode->blackboardKeys) {
+        toDelete.erase(key);
+      }
+      if (toDelete.size() == 0) return; //If we run out of keys to delete, we are done
+    }
+
+    for (const auto& key : toDelete) {
+      m_blackboard.data.erase(key);
+    }
+  }
 }
 
 void ArborMaster::EditorTree::updateTree()
@@ -76,6 +99,7 @@ void ArborMaster::EditorTree::drawDropZone(const NodeFactory& nodeCache)
         int id = getNewId();
         m_editorNodes.emplace(id, EditorNode(nodeCache.getNodes().at(droppedTree), ImGui::GetMousePos(), id));
         m_freeNodes.emplace(id);
+        updateBlackboard(*(m_editorNodes.at(id).treeNode));
         ImNodes::SetNodeScreenSpacePos(id, ImGui::GetMousePos());
         ImNodes::SnapNodeToGrid(id);
       }
@@ -110,9 +134,9 @@ void ArborMaster::EditorTree::deleteEditorNode(EditorNode node)
     int parentId = -1;
     int linkId = -1;
     for (auto& [id, link] : m_editorLinks) {
-      if (link.endId >> 8 == node.id) {
+      if (getLinkChild(link) == node.id) {
         linkId = link.id;
-        parentId = link.startId >> 16;
+        parentId = getLinkParent(link);
       }
     }
     if (parentId != -1 && linkId != -1) {
@@ -122,6 +146,7 @@ void ArborMaster::EditorTree::deleteEditorNode(EditorNode node)
     }
   }
   m_editorNodes.erase(node.id);
+  updateBlackboard(*node.treeNode, false);
 }
 
 ArborMaster::EditorTree::EditorTree(

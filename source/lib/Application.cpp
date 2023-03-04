@@ -61,7 +61,7 @@ void Application::run() {
     ImGui::NewFrame();
 
     //Draw
-    ImGui::ShowDemoWindow();
+    //ImGui::ShowDemoWindow();
     m_ui.drawTabs();
     m_ui.drawNodeList(m_nf);
     m_ui.drawBlackboard(m_editorTree);

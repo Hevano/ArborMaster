@@ -126,12 +126,6 @@ bool ArborMaster::UIView::drawToolbar(
       ImGui::OpenPopup(POPUP_NAMES.at(toolbarAction).c_str());
     }
 
-    //drawExportPopup(exportPath);
-    //drawImportPopup(importPath);
-    //drawNewPopup(savePath); //replace with different / new path variables
-    //drawOpenPopup(savePath); //replace with different / new path variables
-    //drawSaveAsPopup(savePath);
-
     return toolbarAction != ToolBarActions::None;
 }
 
@@ -225,7 +219,8 @@ void ArborMaster::UIView::drawBlackboard(const EditorTree& tree)
     float window_visible_x2 = ImGui::GetWindowPos().x + ImGui::GetWindowContentRegionMax().x;
     ImVec2 itemSize(200, 20);
 
-    std::vector<std::string> keys(tree.getBlackboard().data.size());
+    std::vector<std::string> keys;
+    keys.reserve(tree.getBlackboard().data.size());
     for (auto& k : tree.getBlackboard().data) {
         keys.push_back(k);
     }
@@ -233,7 +228,7 @@ void ArborMaster::UIView::drawBlackboard(const EditorTree& tree)
     auto& style = ImGui::GetStyle();
     for (int n = 0; n < keys.size(); n++) {
         ImGui::PushID(n);
-        ImGui::BulletText(std::format("key: {}", n).c_str(), keys[n]);
+        ImGui::BulletText(std::format("key: {}", keys[n]).c_str());
         float last_button_x2 = ImGui::GetItemRectMax().x;
         float next_button_x2 = last_button_x2 + style.ItemSpacing.x + itemSize.x;  // Expected position if next button was on same line
         if (n + 1 < keys.size() && next_button_x2 < window_visible_x2)
