@@ -1,37 +1,62 @@
 #pragma once
 
 #include <functional>
+#include <string>
 
 namespace ArborMaster {
-	class NodeCache;
+	class NodeFactory;
 	class TreeNode;
 	class EditorTree;
 	class UIView {
 	private:
-		inline static const std::string EXPORT_POPUP_NAME = "Tree Export";
-		inline static const std::string IMPORT_POPUP_NAME = "Node Import";
-		inline static const std::string OPEN_POPUP_NAME = "Open Tree Design";
-		inline static const std::string NEW_POPUP_NAME = "New Tree Design";
-		inline static const std::string SAVE_AS_POPUP_NAME = "Save As";
+		enum class ToolBarActions
+		{
+		None,
+		New,
+		Save,
+		SaveAs,
+		Open,
+		Export,
+		Import
+		};
+
+		inline static const std::unordered_map<ToolBarActions, std::string> POPUP_NAMES {
+			{ ToolBarActions::New, "New Tree Design" },
+			{ ToolBarActions::Open, "Open Tree Design" },
+			{ ToolBarActions::SaveAs, "Save As" },
+			{ ToolBarActions::Export, "Tree Export" },
+			{ ToolBarActions::Import, "Tree Import" },
+		};
 
 	public:
 		std::function<void(void)> exportCallback;
 		std::function<void(void)> importCallback;
 		std::function<void(void)> saveCallback;
 		std::function<void(void)> loadCallback;
+		std::function<void(void)> newTreeCallback;
 
 	public:
 		void drawExportPopup(std::string& path);
 		void drawImportPopup(std::string& path);
 		void drawNewPopup(std::string& path);
-		void drawLoadPopup(std::string& path);
+		void drawOpenPopup(std::string& path);
 		void drawSaveAsPopup(std::string& path);
 
-		void drawToolbar();
+		//Returns true if popup was opened
+		bool drawToolbar(std::string& exportPath, std::string& importPath, std::string& savePath);
 		void drawTabs();
-		void drawNodeList(NodeCache nodes);
+		void drawNodeList(const NodeFactory& nodeCache);
 		void drawNode(const TreeNode& n, bool draggable = false);
 		void drawBlackboard(const EditorTree& tree);
+
+	private:
+		void drawPopup(
+			const std::string& name,
+			const std::string& msg,
+			std::string& path,
+			std::function<void(void)> callback,
+			std::string fieldText = ""
+		);
 	};
 }
 

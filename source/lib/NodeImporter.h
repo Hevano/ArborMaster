@@ -21,8 +21,14 @@ private:
   inline const static std::string NODE_DELIMITER_STRING = "|";
 
 public:
-  void setPath(const std::string& path);
-  const std::string& getPath() const;
+  inline std::string& getPath()
+  {
+    return m_path;
+  }
+  void inline setPath(const std::string& path)
+  {
+    m_path = path;
+  }
   void importAll(std::unordered_map<std::string, TreeNode>& importedNodes);
 
 private:

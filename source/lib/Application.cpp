@@ -35,7 +35,13 @@ Application::Application() {
   ImNodes::GetIO().LinkDetachWithModifierClick.Modifier = &ImGui::GetIO().KeyCtrl;
 
   importNodes();
-  m_ui.loadEditorTree(*this);
+
+  //Bind UI Callbacks
+  m_ui.exportCallback = std::bind(&Application::exportTree, this);
+  m_ui.importCallback = std::bind(&Application::importNodes, this);
+  m_ui.saveCallback = std::bind(&Application::saveTree, this);
+  m_ui.newTreeCallback = std::bind(&Application::newTree, this);
+  m_ui.loadCallback = std::bind(&Application::loadTree, this);
 }
 Application::~Application() {
   ImGui_ImplGlfw_Shutdown();
@@ -56,7 +62,22 @@ void Application::run() {
 
     //Draw
     ImGui::ShowDemoWindow();
-    m_ui.draw(*this);
+    m_ui.drawTabs();
+    m_ui.drawNodeList(m_nf);
+    m_ui.drawBlackboard(m_editorTree);
+
+    //If toolbar returns true, a popup was opened
+    m_ui.drawToolbar(m_exporter.getPath(), m_importer.getPath(), m_editorTree.getPath());
+
+    m_ui.drawExportPopup(m_exporter.getPath());
+    m_ui.drawImportPopup(m_importer.getPath());
+    m_ui.drawNewPopup(m_editorTree.getPath()); //replace with different / new path variables
+    m_ui.drawOpenPopup(m_editorTree.getPath()); //replace with different / new path variables
+    m_ui.drawSaveAsPopup(m_editorTree.getPath());
+
+    //Draw Tree
+    m_editorTree.draw(m_nf);
+
 
     //Display Frame
     ImGui::Render();
@@ -71,6 +92,13 @@ void Application::importNodes() {
   m_importer.importAll(m_nf.getNodes());
 }
 void Application::exportTree() {}
-void Application::saveTree() {}
+void Application::saveTree()
+{
+  m_exporter.saveDesign(m_editorTree, m_editorTree.getNewId() - 1);
+}
 void Application::newTree() {}
+void Application::loadTree()
+{
+  m_exporter.loadDesign(m_editorTree, m_nf, m_editorTree.getPath());
+}
 }

@@ -2,19 +2,14 @@
 #include "EditorNode.h"
 
 #include <nlohmann/json.hpp>
+#include "imnodes.h"
 
 #include <fstream>
 #include <algorithm>
+#include <filesystem>
 
 namespace ArborMaster
 {
-const std::string& TreeExporter::getPath() const
-{
-  return m_path;
-}
-void TreeExporter::setPath(const std::string& path) {
-  m_path = path;
-}
 void TreeExporter::exportTree(
     const std::unordered_map<int, std::vector<int>>& adjList,
     const std::unordered_map<int, EditorNode>& nodes) const
@@ -31,12 +26,99 @@ void TreeExporter::exportTree(
   stream << std::setw(4) << tree << std::endl;
   stream.close();
 }
-void TreeExporter::saveDesign(const BehaviourTree& bt, const std::string& path) const
+
+void to_json(json& j, const EditorLink& link)
 {
+  j = json{ {"id", link.id}, {"startId", link.startId}, {"endId", link.endId} };
 }
-BehaviourTree TreeExporter::loadDesign(const std::string& path)
+
+void from_json(const json& j, EditorLink& link)
 {
-  return BehaviourTree();
+  j.at("id").get_to(link.id);
+  j.at("startId").get_to(link.startId);
+  j.at("endId").get_to(link.endId);
+}
+
+void to_json(json& j, const EditorNode& node)
+{
+  //We treat TreeNode ptrs as int for design serialization, because they may have change when we reload a design
+  j = json{ {"id", node.id}, {"treeNode", reinterpret_cast<intptr_t>(node.treeNode)} };
+}
+
+void from_json(const json& j, EditorNode& node)
+{
+  j.at("id").get_to(node.id);
+  node.treeNode = reinterpret_cast<const TreeNode*>(j.at("treeNode").get<intptr_t>());
+}
+
+void TreeExporter::saveDesign(const EditorTree& t, int currentId) const
+{
+  std::filesystem::path pathObj = t.getPath();
+  std::filesystem::path iniPathObj = t.getPath();
+  iniPathObj.replace_extension(".ini");
+
+  ImNodes::SaveCurrentEditorStateToIniFile(iniPathObj.string().c_str());
+
+  json j;
+
+  //We need to create a table to translate the pointers to the treeNodes used with their names
+  std::unordered_map<intptr_t, std::string> nodeDefs;
+  for (auto& [id, node] : t.m_editorNodes) {
+    nodeDefs.emplace(std::make_pair(reinterpret_cast<intptr_t>(node.treeNode), node.treeNode->name));
+  }
+
+
+  j["editorNodes"] = json(t.m_editorNodes);
+  j["nodeDefs"] = json(nodeDefs);
+  j["editorLinks"] = json(t.m_editorLinks);
+  j["adjList"] = json(t.m_adjList);
+  j["freeNodes"] = json(t.m_freeNodes);
+  j["currentId"] = json(currentId);
+
+  std::ofstream stream(pathObj);
+  stream << std::setw(4) << j << std::endl;
+  stream.close();
+}
+bool TreeExporter::loadDesign(EditorTree& t, const NodeFactory& nodeCache, const std::string& path)
+{
+  std::filesystem::path pathObj = t.getPath();
+  std::filesystem::path iniPathObj = t.getPath();
+  iniPathObj.replace_extension(".ini");
+
+  if (!std::filesystem::exists(pathObj) || !std::filesystem::exists(iniPathObj)) {
+    return false;
+  }
+
+  ImNodes::LoadCurrentEditorStateFromIniFile(iniPathObj.string().c_str());
+
+  std::ifstream stream(path);
+  json data;
+  stream >> data;
+
+  stream.close();
+
+  data["editorNodes"].get_to(t.m_editorNodes);
+  data["editorLinks"].get_to(t.m_editorLinks);
+  data["adjList"].get_to(t.m_adjList);
+  data["freeNodes"].get_to(t.m_freeNodes);
+  data["currentId"].get_to(t.m_editorId);
+
+  std::unordered_map<intptr_t, std::string> nodeDefs;
+  data["nodeDefs"].get_to(nodeDefs);
+
+  for (auto& [id, node] : t.m_editorNodes) {
+    intptr_t tn = reinterpret_cast<intptr_t>(node.treeNode);
+    if (nodeDefs.contains(tn) && nodeCache.getNodes().contains(nodeDefs[tn])) {
+      node.treeNode = &nodeCache.getNodes().at(nodeDefs[tn]);
+    }
+    else {
+      return false; //If we cannot find the translations, loading has failed
+    }
+  }
+
+  t.m_designPath = path;
+
+  return true;
 }
 json TreeExporter::traverseTree(
     int id, 

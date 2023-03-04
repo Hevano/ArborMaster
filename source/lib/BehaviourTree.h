@@ -15,7 +15,7 @@ namespace ArborMaster {
     BehaviourTree();
     void updateBlackboard();
     TreeNode& getRoot();
-    const Blackboard& getBlackboard();
+    const Blackboard& getBlackboard() const;
 
   };
 }

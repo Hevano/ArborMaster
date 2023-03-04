@@ -3,13 +3,6 @@
 
 namespace ArborMaster
 {
-void NodeImporter::setPath(const std::string& path) {
-  m_path = path;
-}
-const std::string& NodeImporter::getPath() const
-{
-  return m_path;
-}
 void NodeImporter::importAll(std::unordered_map<std::string, TreeNode>& importedNodes)
 {
   std::ifstream sourceFile(m_path);

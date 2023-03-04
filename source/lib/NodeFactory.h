@@ -12,7 +12,12 @@ namespace ArborMaster
   public:
     //TODO: Consider move semantics
     TreeNode createNode(const std::string& nodeName) const;
-    std::unordered_map<std::string, TreeNode>& getNodes();
+    //const and non-const getters
+    const std::unordered_map<std::string, TreeNode>& getNodes() const;
+    inline std::unordered_map<std::string, TreeNode>& getNodes()
+    {
+      return const_cast<std::unordered_map<std::string, TreeNode>&>(const_cast<const NodeFactory*>(this)->getNodes());
+    }
   };
 };
 

@@ -10,7 +10,7 @@ TreeNode& BehaviourTree::getRoot()
 {
   return *m_root;
 }
-const Blackboard& BehaviourTree::getBlackboard()
+const Blackboard& BehaviourTree::getBlackboard() const
 {
   return m_blackboard;
 }

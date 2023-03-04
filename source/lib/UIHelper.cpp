@@ -40,7 +40,7 @@ void UIHelper::drawExportPopup(Application& a)
     a.m_exporter.setPath(path);
 
     if (ImGui::Button("OK", ImVec2(120, 0))) {
-      a.m_exporter.exportTree(m_adjList, m_editorNodes);
+      //a.m_exporter.exportTree(m_adjList, m_editorNodes);
       ImGui::CloseCurrentPopup();
     }
     ImGui::SameLine();
@@ -378,8 +378,7 @@ void UIHelper::drawEditorTree(Application& a)
       ImNodes::BeginNode(childId);
 
       ImNodes::BeginNodeTitleBar();
-      std::string title = "(" + std::to_string(childCount++) + ") " + m_editorNodes.at(childId).treeNode->name;
-      ImGui::TextUnformatted(title.c_str());
+      ImGui::TextUnformatted(std::format("({}) {}", childCount++, m_editorNodes.at(childId).treeNode->name).c_str());
       ImNodes::EndNodeTitleBar();
 
       ImNodes::BeginInputAttribute(childId << 8);
