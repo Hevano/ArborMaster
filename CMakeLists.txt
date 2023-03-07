@@ -35,6 +35,16 @@ include(FetchContent)
 FetchContent_Declare(json URL https://github.com/nlohmann/json/releases/download/v3.11.2/json.tar.xz)
 FetchContent_MakeAvailable(json)
 
+FetchContent_Declare(json URL https://github.com/nlohmann/json/releases/download/v3.11.2/json.tar.xz)
+FetchContent_MakeAvailable(json)
+
+FetchContent_Declare(
+  Boost
+  GIT_REPOSITORY https://github.com/boostorg/boost.git
+  GIT_TAG boost-1.80.0
+)
+FetchContent_MakeAvailable(Boost)
+
 
 # ---- Declare library ----
 
@@ -55,7 +65,7 @@ target_include_directories(
 
 target_compile_features(ArborMaster_lib PUBLIC cxx_std_20)
 
-target_link_libraries(ArborMaster_lib PUBLIC glfw OpenGL::GL glad imgui imnodes)
+target_link_libraries(ArborMaster_lib PUBLIC glfw OpenGL::GL glad imgui imnodes Boost::interprocess)
 
 target_link_libraries(ArborMaster_lib PUBLIC nlohmann_json::nlohmann_json)
 

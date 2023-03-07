@@ -12,16 +12,22 @@
 #include "imgui_impl_glfw.h"
 #include "imnodes.h"
 
+#include <boost/interprocess/ipc/message_queue.hpp>
+#include <boost/interprocess/containers/flat_map.hpp>
+
 #include <unordered_map>
 #include <string>
 #include <vector>
 
 namespace ArborMaster
 {
+  namespace ipc = boost::interprocess;
   class Application
   {
     friend class UIHelper;
   private:
+
+    unsigned int update[3];
     
     std::unordered_map<std::string, AIActor> m_actors;
     NodeFactory m_nf;

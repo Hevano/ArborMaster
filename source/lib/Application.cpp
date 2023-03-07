@@ -60,6 +60,20 @@ void Application::run() {
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
 
+    
+    size_t recv_size;
+    unsigned int priority;
+
+    ipc::message_queue mq(ipc::open_only, "NodeUpdateMessageQueue");
+
+    mq.receive(update, sizeof(update), recv_size, priority);
+
+    ImGui::Begin("Node Updates");
+    ImGui::Text(std::format("node id: {}", update[0]).c_str());
+    ImGui::Text(std::format("actor id: {}", update[1]).c_str());
+    ImGui::Text(std::format("status: {}", update[2]).c_str());
+    ImGui::End();
+
     //Draw
     //ImGui::ShowDemoWindow();
     m_ui.drawTabs();
