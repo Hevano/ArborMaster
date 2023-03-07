@@ -26,8 +26,6 @@ namespace ArborMaster
   {
     friend class UIHelper;
   private:
-
-    unsigned int update[3];
     
     std::unordered_map<std::string, AIActor> m_actors;
     NodeFactory m_nf;

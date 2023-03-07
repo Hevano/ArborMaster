@@ -44,6 +44,7 @@ namespace ArborMaster {
 
 		//Returns true if popup was opened
 		bool drawToolbar(std::string& exportPath, std::string& importPath, std::string& savePath);
+		void drawActorList(const std::unordered_map<unsigned int, std::string>& actorMap);
 		void drawTabs();
 		void drawNodeList(const NodeFactory& nodeCache);
 		void drawNode(const TreeNode& n, bool draggable = false);

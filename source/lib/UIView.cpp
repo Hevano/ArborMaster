@@ -37,6 +37,20 @@ void ArborMaster::UIView::drawSaveAsPopup(std::string& path)
 }
 
 
+void ArborMaster::UIView::drawActorList(const std::unordered_map<unsigned int, std::string>& actorMap)
+{
+  if (ImGui::BeginMenu("View")) { //Append to view menu in toolbar
+    if (ImGui::MenuItem("Actors", "CTRL+???")) {
+      ImGui::BeginChild("child", ImVec2(0, 60), true);
+      for (auto& [id, treePath] : actorMap)
+        ImGui::Text(std::format("{}: {}", id, treePath).c_str());
+      ImGui::EndChild();
+    }
+    ImGui::EndMenu();
+  }
+  
+}
+
 void ArborMaster::UIView::drawPopup(
   const std::string& name,
   const std::string& msg,
@@ -116,8 +130,7 @@ bool ArborMaster::UIView::drawToolbar(
             ImGui::EndMenu();
         }
         if (ImGui::BeginMenu("View")) {
-            if (ImGui::MenuItem("Unknown", "CTRL+???")) {
-            }
+            
             ImGui::EndMenu();
         }
         ImGui::EndMainMenuBar();

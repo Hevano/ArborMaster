@@ -60,20 +60,6 @@ void Application::run() {
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
 
-    
-    size_t recv_size;
-    unsigned int priority;
-
-    ipc::message_queue mq(ipc::open_only, "NodeUpdateMessageQueue");
-
-    mq.receive(update, sizeof(update), recv_size, priority);
-
-    ImGui::Begin("Node Updates");
-    ImGui::Text(std::format("node id: {}", update[0]).c_str());
-    ImGui::Text(std::format("actor id: {}", update[1]).c_str());
-    ImGui::Text(std::format("status: {}", update[2]).c_str());
-    ImGui::End();
-
     //Draw
     //ImGui::ShowDemoWindow();
     m_ui.drawTabs();
@@ -82,6 +68,9 @@ void Application::run() {
 
     //If toolbar returns true, a popup was opened
     m_ui.drawToolbar(m_exporter.getPath(), m_importer.getPath(), m_editorTree.getPath());
+    std::unordered_map<unsigned int, std::string> actorMap = { {1, "path1"}, {2, "path2"}, {3, "path3"} };
+    m_ui.drawActorList(actorMap);
+
 
     m_ui.drawExportPopup(m_exporter.getPath());
     m_ui.drawImportPopup(m_importer.getPath());
@@ -92,6 +81,8 @@ void Application::run() {
     //Draw Tree
     m_editorTree.draw(m_nf);
 
+
+    ImGui::ShowDemoWindow();
 
     //Display Frame
     ImGui::Render();
