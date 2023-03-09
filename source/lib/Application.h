@@ -5,6 +5,7 @@
 #include "NodeImporter.h"
 #include "TreeExporter.h"
 #include "EditorTree.h"
+#include "DebugManager.h"
 
 #include "glad/glad.h"
 #include "GLFW/glfw3.h"
@@ -34,6 +35,7 @@ namespace ArborMaster
     UIView m_ui;
     EditorTree m_editorTree;
     std::vector<EditorNode> m_editorNodes;
+    std::unique_ptr<DebugManager> m_debugManager;
 
     struct GLFWwindow* m_window;
 

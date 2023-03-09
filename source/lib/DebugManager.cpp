@@ -16,8 +16,10 @@ DebugManager* DebugManager::createInstance()
     //Loop through the paths found in ActorIdMap and ensure that those files exist, both as json and ini
 
     for (auto it = dm->m_actorIdMap->begin(); it != dm->m_actorIdMap->end(); it++) {
-      std::filesystem::path pathDesignJson(it->second);
-      std::filesystem::path pathDesignIni(it->second);
+      auto f = it->first;
+      auto s = it->second;
+      std::filesystem::path pathDesignJson(std::string(s.begin(), s.end()));
+      std::filesystem::path pathDesignIni(std::string(s.begin(), s.end()));
       pathDesignIni.replace_extension(".ini");
 
       if (pathDesignJson.extension() != ".json") throw std::exception();

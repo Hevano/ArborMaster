@@ -36,12 +36,15 @@ Application::Application() {
 
   importNodes();
 
+  m_debugManager.reset(DebugManager::createInstance());
+
   //Bind UI Callbacks
   m_ui.exportCallback = std::bind(&Application::exportTree, this);
   m_ui.importCallback = std::bind(&Application::importNodes, this);
   m_ui.saveCallback = std::bind(&Application::saveTree, this);
   m_ui.newTreeCallback = std::bind(&Application::newTree, this);
   m_ui.loadCallback = std::bind(&Application::loadTree, this);
+  m_ui.actorClickCallback = [&](unsigned int x) { m_debugManager->selectActor(x); };
 }
 Application::~Application() {
   ImGui_ImplGlfw_Shutdown();
@@ -69,6 +72,11 @@ void Application::run() {
     //If toolbar returns true, a popup was opened
     m_ui.drawToolbar(m_exporter.getPath(), m_importer.getPath(), m_editorTree.getPath());
     std::unordered_map<unsigned int, std::string> actorMap = { {1, "path1"}, {2, "path2"}, {3, "path3"} };
+
+    for (int i = 0; i < 20; i++) {
+      actorMap.emplace(std::make_pair(i, std::format("path{}", i)));
+    }
+
     m_ui.drawActorList(actorMap);
 
 

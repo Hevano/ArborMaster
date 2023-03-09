@@ -34,6 +34,7 @@ namespace ArborMaster {
 		std::function<void(void)> saveCallback;
 		std::function<void(void)> loadCallback;
 		std::function<void(void)> newTreeCallback;
+		std::function<void(unsigned int)> actorClickCallback;
 
 	public:
 		void drawExportPopup(std::string& path);
