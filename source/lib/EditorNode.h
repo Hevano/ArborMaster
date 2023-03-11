@@ -8,10 +8,17 @@ namespace ArborMaster
 {
 struct EditorNode
 {
+
+  enum class NodeStatus : unsigned int {
+    RUNNING = 0,
+    FAILED = 1,
+    SUCCEEDED = 2
+  };
+
   int id;
   ImVec2 position;
   TreeNode const* treeNode;
-
+  NodeStatus staus = NodeStatus::SUCCEEDED;
   EditorNode() = default;
 
   EditorNode(const TreeNode& tn, ImVec2 pos, int id)

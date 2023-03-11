@@ -28,9 +28,7 @@ public:
     m_path = path;
   }
   //Exports the tree to m_path for use in client code
-  void exportTree(
-    const std::unordered_map<int, std::vector<int>>& adjList,
-    const std::unordered_map<int, EditorNode>& nodes) const;
+  void exportTree(const EditorTree& tree) const;
 
   //saves the design of the tree to path in serialized json format
   void saveDesign(const EditorTree& t, int currentId) const;

@@ -13,15 +13,10 @@ namespace ipc = boost::interprocess;
 class DebugManager {
 private:
   unsigned int m_nodeUpdateBuffer[3] = { 0,0,0 };
+  unsigned int m_currentActorId = 0;
 
-  typedef ipc::allocator<char, ipc::managed_shared_memory::segment_manager> char_allocator_type;
-  typedef ipc::basic_string<char, std::char_traits<char>, char_allocator_type> char_string_type;
-
-  typedef ipc::allocator<std::pair<const std::string, std::string>, ipc::managed_shared_memory::segment_manager> bb_allocator_type;
-  typedef ipc::flat_map<std::string, std::string, std::less<std::string>, bb_allocator_type> bb_map_type;
-
-  //typedef ipc::allocator<std::pair<unsigned int, char_string_type>, ipc::managed_shared_memory::segment_manager> actorid_allocator_type;
-  //typedef ipc::flat_map<unsigned int, char_string_type, std::less<unsigned int>, actorid_allocator_type> actorid_map_type;
+  typedef ipc::allocator<std::pair<const ipc::basic_string<char>, ipc::basic_string<char>>, ipc::managed_shared_memory::segment_manager> bb_allocator_type;
+  typedef ipc::flat_map<ipc::basic_string<char>, ipc::basic_string<char>, std::less<ipc::basic_string<char>>, bb_allocator_type> bb_map_type;
 
   typedef ipc::allocator<std::pair<const unsigned int, ipc::basic_string<char>>, ipc::managed_shared_memory::segment_manager> actorid_allocator_type;
   typedef ipc::flat_map<unsigned int, ipc::basic_string<char>, std::less<unsigned int>, actorid_allocator_type> actorid_map_type;
@@ -36,10 +31,16 @@ private:
 
 public:
   static DebugManager* createInstance();
-	bool getNodeUpdates(unsigned int& nodeId, unsigned int& actorId, unsigned int& statusId);
+	bool getNodeUpdates(unsigned int& nodeId, unsigned int& actorId, unsigned int& status);
 
   std::unordered_map<unsigned int, std::string> getAllActors() const;
 
   bool selectActor(unsigned int actorId);
+
+  inline unsigned int getCurrentActor() { return m_currentActorId; }
+
+  std::unordered_map<std::string, std::string> getBlackboard();
+
+  ~DebugManager();
 
 };

@@ -10,20 +10,25 @@
 
 namespace ArborMaster
 {
-void TreeExporter::exportTree(
-    const std::unordered_map<int, std::vector<int>>& adjList,
-    const std::unordered_map<int, EditorNode>& nodes) const
+void TreeExporter::exportTree(const EditorTree& tree) const
 {
-  
-  json tree;
+  json jTree;
 
-  for (auto childId : adjList.at(1))
+  /*if (tree.getPath().empty()) {
+    std::filesystem::path designPath(m_path);
+    designPath.replace_filename(designPath.filename().string() + "Design");
+
+  }*/
+
+  jTree["debugPath"] = json(tree.getPath());
+
+  for (auto childId : tree.m_adjList.at(1))
   {
-    tree["root"] = traverseTree(childId, adjList, nodes);
+    jTree["root"] = traverseTree(childId, tree.m_adjList, tree.m_editorNodes);
   }
 
   std::ofstream stream(m_path);
-  stream << std::setw(4) << tree << std::endl;
+  stream << std::setw(4) << jTree << std::endl;
   stream.close();
 }
 

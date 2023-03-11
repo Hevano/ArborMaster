@@ -36,7 +36,7 @@ Application::Application() {
 
   importNodes();
 
-  m_debugManager.reset(DebugManager::createInstance());
+  
 
   //Bind UI Callbacks
   m_ui.exportCallback = std::bind(&Application::exportTree, this);
@@ -44,7 +44,14 @@ Application::Application() {
   m_ui.saveCallback = std::bind(&Application::saveTree, this);
   m_ui.newTreeCallback = std::bind(&Application::newTree, this);
   m_ui.loadCallback = std::bind(&Application::loadTree, this);
-  m_ui.actorClickCallback = [&](unsigned int x) { m_debugManager->selectActor(x); };
+
+  //Enable actor list if we can create a debug manager
+  m_debugManager.reset(DebugManager::createInstance());
+
+  if (m_debugManager) {
+    m_ui.actorClickCallback = [&](unsigned int x) { return m_debugManager->selectActor(x); };
+  }
+  
 }
 Application::~Application() {
   ImGui_ImplGlfw_Shutdown();
@@ -67,24 +74,35 @@ void Application::run() {
     //ImGui::ShowDemoWindow();
     m_ui.drawTabs();
     m_ui.drawNodeList(m_nf);
-    m_ui.drawBlackboard(m_editorTree);
+    
+    if (m_debugManager) {
+      m_ui.drawBlackboard(m_debugManager->getBlackboard());
+    }
+    else {
+      m_ui.drawBlackboard(m_editorTree);
+    }
 
     //If toolbar returns true, a popup was opened
     m_ui.drawToolbar(m_exporter.getPath(), m_importer.getPath(), m_editorTree.getPath());
-    std::unordered_map<unsigned int, std::string> actorMap = { {1, "path1"}, {2, "path2"}, {3, "path3"} };
 
-    for (int i = 0; i < 20; i++) {
-      actorMap.emplace(std::make_pair(i, std::format("path{}", i)));
+
+    if (m_debugManager) {
+      m_ui.drawActorList(m_debugManager->getAllActors());
     }
-
-    m_ui.drawActorList(actorMap);
-
 
     m_ui.drawExportPopup(m_exporter.getPath());
     m_ui.drawImportPopup(m_importer.getPath());
     m_ui.drawNewPopup(m_editorTree.getPath()); //replace with different / new path variables
     m_ui.drawOpenPopup(m_editorTree.getPath()); //replace with different / new path variables
     m_ui.drawSaveAsPopup(m_editorTree.getPath());
+
+    if (m_debugManager) {
+      unsigned int actorId, nodeId, status;
+      m_debugManager->getNodeUpdates(actorId, nodeId, status);
+      if (actorId == m_debugManager->getCurrentActor()) {
+        m_editorTree.updateNodeStatus(nodeId, status);
+      }
+    }
 
     //Draw Tree
     m_editorTree.draw(m_nf);
@@ -104,7 +122,9 @@ void Application::importNodes() {
 
   m_importer.importAll(m_nf.getNodes());
 }
-void Application::exportTree() {}
+void Application::exportTree() {
+  m_exporter.exportTree(m_editorTree);
+}
 void Application::saveTree()
 {
   m_exporter.saveDesign(m_editorTree, m_editorTree.getNewId() - 1);

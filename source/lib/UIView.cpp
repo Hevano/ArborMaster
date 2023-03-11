@@ -229,7 +229,6 @@ void ArborMaster::UIView::drawNode(const TreeNode& n, bool draggable)
     ImGui::PopStyleVar();
 }
 
-//TODO
 void ArborMaster::UIView::drawBlackboard(const EditorTree& tree)
 {
     ImGuiWindowFlags windowFlags = 0;
@@ -260,4 +259,33 @@ void ArborMaster::UIView::drawBlackboard(const EditorTree& tree)
         ImGui::PopID();
     }
     ImGui::End();
+}
+
+void ArborMaster::UIView::drawBlackboard(const std::unordered_map<std::string, std::string>& debugBlackboard)
+{
+  ImGuiWindowFlags windowFlags = 0;
+
+  windowFlags |= ImGuiWindowFlags_NoMove;
+  windowFlags |= ImGuiWindowFlags_NoResize;
+  bool nodeListOpen = false;
+  const auto viewport = ImGui::GetMainViewport();
+  ImGui::SetNextWindowSize(ImVec2(viewport->WorkSize.x, viewport->WorkSize.y * 0.2f), ImGuiCond_Always);
+  ImGui::SetNextWindowPos(ImVec2(viewport->WorkPos.x, viewport->WorkPos.y + viewport->WorkSize.y * 0.8f), ImGuiCond_Always, ImVec2(0.0f, 0.0f));
+  ImGui::Begin("Blackboard", nullptr, windowFlags);
+  float window_visible_x2 = ImGui::GetWindowPos().x + ImGui::GetWindowContentRegionMax().x;
+  ImVec2 itemSize(200, 20);
+
+  auto& style = ImGui::GetStyle();
+  int n = 0;
+  for (auto& [key, value] : debugBlackboard) {
+    ImGui::PushID(n);
+    ImGui::BulletText(std::format("{} | {}", key, value).c_str());
+    float last_button_x2 = ImGui::GetItemRectMax().x;
+    float next_button_x2 = last_button_x2 + style.ItemSpacing.x + itemSize.x;  // Expected position if next button was on same line
+    if (n + 1 < debugBlackboard.size() && next_button_x2 < window_visible_x2)
+      ImGui::SameLine();
+    ImGui::PopID();
+    n++;
+  }
+  ImGui::End();
 }

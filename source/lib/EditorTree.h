@@ -4,6 +4,9 @@
 #include "Blackboard.h"
 #include "NodeFactory.h"
 
+#include "imnodes.h"
+#include "imnodes_internal.h"
+
 #include <unordered_map>
 #include <unordered_set>
 
@@ -57,6 +60,9 @@ namespace ArborMaster {
       return node.id << 16;
     }
 
+    void setNodeColor(const EditorNode& node);
+    
+
   public:
     EditorTree() = default;
     EditorTree(
@@ -69,6 +75,7 @@ namespace ArborMaster {
     const Blackboard& getBlackboard() const;
     void drawDropZone(const NodeFactory& nodeCache);
     void draw(const NodeFactory& nodeCache);
+    void updateNodeStatus(unsigned int nodeId, unsigned int status);
 
     const inline std::string& getPath() const
     {

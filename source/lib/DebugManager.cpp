@@ -22,13 +22,13 @@ DebugManager* DebugManager::createInstance()
       std::filesystem::path pathDesignIni(std::string(s.begin(), s.end()));
       pathDesignIni.replace_extension(".ini");
 
-      if (pathDesignJson.extension() != ".json") throw std::exception();
-      if(!std::filesystem::exists(pathDesignJson)) throw std::exception();
-      if (!std::filesystem::exists(pathDesignIni)) throw std::exception();
+      //if (pathDesignJson.extension() != ".json") throw std::exception();
+      //if(!std::filesystem::exists(pathDesignJson)) throw std::exception();
+      //if (!std::filesystem::exists(pathDesignIni)) throw std::exception();
 
-      //Paths should be absolute
-      if (!pathDesignJson.is_absolute()) throw std::exception();
-      if (!pathDesignJson.is_absolute()) throw std::exception();
+      ////Paths should be absolute
+      //if (!pathDesignJson.is_absolute()) throw std::exception();
+      //if (!pathDesignJson.is_absolute()) throw std::exception();
     }
 
     return dm;
@@ -46,7 +46,7 @@ DebugManager* DebugManager::createInstance()
 
 
 
-bool DebugManager::getNodeUpdates(unsigned int& nodeId, unsigned int& actorId, unsigned int& statusId)
+bool DebugManager::getNodeUpdates(unsigned int& nodeId, unsigned int& actorId, unsigned int& status)
 {
   ipc::message_queue msgQueue(ipc::open_or_create, "NodeUpdateMessageQueue", 100, sizeof(unsigned int));
   try {
@@ -57,7 +57,7 @@ bool DebugManager::getNodeUpdates(unsigned int& nodeId, unsigned int& actorId, u
       if (recv_size == 3) { //always expect 3 items
         nodeId = m_nodeUpdateBuffer[0];
         actorId = m_nodeUpdateBuffer[1];
-        statusId = m_nodeUpdateBuffer[2];
+        status = m_nodeUpdateBuffer[2];
         return true;
       }
     }
@@ -73,7 +73,7 @@ std::unordered_map<unsigned int, std::string> DebugManager::getAllActors() const
 {
   std::unordered_map<unsigned int, std::string> map;
   for (auto it = m_actorIdMap->begin(); it != m_actorIdMap->end(); it++) {
-    map.emplace(*it);
+    map.emplace(it->first, std::string(it->second.begin(), it->second.end()));
   }
   return map;
 }
@@ -82,13 +82,30 @@ bool DebugManager::selectActor(unsigned int actorId)
 {
   ipc::message_queue mq(ipc::open_or_create, "ActorSelectMessageQueue", 100, sizeof(unsigned int));
   try {
-    mq.send(&actorId, sizeof(unsigned int), 0);
+    mq.send(&actorId, sizeof(actorId), 0);
+    m_currentActorId = actorId;
     return true;
   }
   catch (ipc::interprocess_exception& ex) {
     //throws error if queue is empty
   }
   return false;
+}
+
+std::unordered_map<std::string, std::string> DebugManager::getBlackboard()
+{
+  std::unordered_map<std::string, std::string> map;
+  for (auto it = m_blackBoardMap->begin(); it != m_blackBoardMap->end(); it++) {
+    map.emplace(std::string(it->first.begin(), it->first.end()), std::string(it->second.begin(), it->second.end()));
+  }
+  return map;
+}
+
+DebugManager::~DebugManager()
+{
+  //given that we do not own the flat map's memory, we shouldn't free them when we deconstruct. TODO: custom deleter
+  m_actorIdMap.release();
+  m_blackBoardMap.release();
 }
 
 

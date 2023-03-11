@@ -1,9 +1,6 @@
 #include "EditorTree.h"
 #include "NodeFactory.h"
 
-#include "imnodes.h"
-#include "imnodes_internal.h"
-
 #include <algorithm>
 #include <format>
 
@@ -149,6 +146,28 @@ void ArborMaster::EditorTree::deleteEditorNode(EditorNode node)
   updateBlackboard(*node.treeNode, false);
 }
 
+void ArborMaster::EditorTree::setNodeColor(const EditorNode& node)
+{
+  unsigned int color = 0;
+  unsigned int colorSelected = 0;
+  switch (node.staus) {
+  case EditorNode::NodeStatus::FAILED:
+    color = IM_COL32(255, 0, 0, 255);
+    colorSelected = IM_COL32(255, 20, 20, 255);
+    break;
+  case EditorNode::NodeStatus::SUCCEEDED:
+    color = IM_COL32(0, 200, 0, 255);
+    colorSelected = IM_COL32(20, 200, 20, 255);
+    break;
+  case EditorNode::NodeStatus::RUNNING:
+    color = IM_COL32(0, 0, 255, 255);
+    colorSelected = IM_COL32(20, 20, 255, 255);
+    break;
+  }
+  ImNodes::PushColorStyle(ImNodesCol_TitleBar, color);
+  ImNodes::PushColorStyle(ImNodesCol_TitleBarSelected, colorSelected);
+}
+
 ArborMaster::EditorTree::EditorTree(
   const std::unordered_map<int, EditorNode>& editorNodes, 
   const std::unordered_set<int>& freeNodes, 
@@ -206,6 +225,7 @@ void ArborMaster::EditorTree::draw(const NodeFactory& nodeCache)
     });
 
     for (auto& childId : childList) {
+      setNodeColor(m_editorNodes.at(childId));
       ImNodes::BeginNode(childId);
 
       ImNodes::BeginNodeTitleBar();
@@ -223,6 +243,9 @@ void ArborMaster::EditorTree::draw(const NodeFactory& nodeCache)
         ImGui::PopStyleColor();
       ImNodes::EndOutputAttribute();
       ImNodes::EndNode();
+
+      ImNodes::PopColorStyle();
+      ImNodes::PopColorStyle();
 
       m_editorNodes.at(childId).position = ImNodes::GetNodeGridSpacePos(childId);
     }
@@ -255,4 +278,11 @@ void ArborMaster::EditorTree::draw(const NodeFactory& nodeCache)
   ImGui::End();
 
   updateTree();
+}
+
+void ArborMaster::EditorTree::updateNodeStatus(unsigned int nodeId, unsigned int status)
+{
+  if (m_editorNodes.contains(nodeId) && nodeId >= 0 && nodeId <= 2) {
+    m_editorNodes[nodeId].staus = static_cast<EditorNode::NodeStatus>(status);
+  }
 }

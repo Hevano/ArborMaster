@@ -34,7 +34,7 @@ namespace ArborMaster {
 		std::function<void(void)> saveCallback;
 		std::function<void(void)> loadCallback;
 		std::function<void(void)> newTreeCallback;
-		std::function<void(unsigned int)> actorClickCallback;
+		std::function<bool(unsigned int)> actorClickCallback;
 
 	public:
 		void drawExportPopup(std::string& path);
@@ -50,6 +50,7 @@ namespace ArborMaster {
 		void drawNodeList(const NodeFactory& nodeCache);
 		void drawNode(const TreeNode& n, bool draggable = false);
 		void drawBlackboard(const EditorTree& tree);
+		void drawBlackboard(const std::unordered_map<std::string, std::string>& debugBlackboard);
 
 	private:
 		void drawPopup(
