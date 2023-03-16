@@ -15,11 +15,14 @@ private:
   unsigned int m_nodeUpdateBuffer[3] = { 0,0,0 };
   unsigned int m_currentActorId = 0;
 
+  typedef ipc::allocator<char, ipc::managed_shared_memory::segment_manager> char_allocator;
+  typedef ipc::basic_string<char, std::char_traits<char>, char_allocator> char_string;
+
+  typedef ipc::allocator<std::pair<const unsigned int, char_string>, ipc::managed_shared_memory::segment_manager> actorid_allocator;
+  typedef ipc::flat_map<unsigned int, char_string, std::less<unsigned int>, actorid_allocator> actorid_map_type;
+
   typedef ipc::allocator<std::pair<const ipc::basic_string<char>, ipc::basic_string<char>>, ipc::managed_shared_memory::segment_manager> bb_allocator_type;
   typedef ipc::flat_map<ipc::basic_string<char>, ipc::basic_string<char>, std::less<ipc::basic_string<char>>, bb_allocator_type> bb_map_type;
-
-  typedef ipc::allocator<std::pair<const unsigned int, ipc::basic_string<char>>, ipc::managed_shared_memory::segment_manager> actorid_allocator_type;
-  typedef ipc::flat_map<unsigned int, ipc::basic_string<char>, std::less<unsigned int>, actorid_allocator_type> actorid_map_type;
 
   ipc::managed_shared_memory m_segment;
   std::unique_ptr<bb_map_type> m_blackBoardMap;

@@ -20,7 +20,9 @@ void TreeExporter::exportTree(const EditorTree& tree) const
 
   }*/
 
-  jTree["debugPath"] = json(tree.getPath());
+  std::filesystem::path designPath(tree.getPath());
+
+  jTree["debugPath"] = json(std::filesystem::absolute(designPath).c_str());
 
   for (auto childId : tree.m_adjList.at(1))
   {

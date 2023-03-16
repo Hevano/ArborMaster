@@ -15,6 +15,9 @@ DebugManager* DebugManager::createInstance()
 
     //Loop through the paths found in ActorIdMap and ensure that those files exist, both as json and ini
 
+    auto x = dm->m_segment.get_free_memory();
+    std::cout << x << std::endl;
+
     for (auto it = dm->m_actorIdMap->begin(); it != dm->m_actorIdMap->end(); it++) {
       auto f = it->first;
       auto s = it->second;
