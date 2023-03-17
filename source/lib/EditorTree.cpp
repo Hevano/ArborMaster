@@ -282,7 +282,7 @@ void ArborMaster::EditorTree::draw(const NodeFactory& nodeCache)
 
 void ArborMaster::EditorTree::updateNodeStatus(unsigned int nodeId, unsigned int status)
 {
-  if (m_editorNodes.contains(nodeId) && nodeId >= 0 && nodeId <= 2) {
+  if (m_editorNodes.contains(nodeId) && status >= 0 && status <= 2) {
     m_editorNodes[nodeId].staus = static_cast<EditorNode::NodeStatus>(status);
   }
 }

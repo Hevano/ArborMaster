@@ -88,8 +88,8 @@ void TreeExporter::saveDesign(const EditorTree& t, int currentId) const
 }
 bool TreeExporter::loadDesign(EditorTree& t, const NodeFactory& nodeCache, const std::string& path)
 {
-  std::filesystem::path pathObj = t.getPath();
-  std::filesystem::path iniPathObj = t.getPath();
+  std::filesystem::path pathObj = path;
+  std::filesystem::path iniPathObj = path;
   iniPathObj.replace_extension(".ini");
 
   if (!std::filesystem::exists(pathObj) || !std::filesystem::exists(iniPathObj)) {

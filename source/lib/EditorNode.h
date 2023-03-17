@@ -13,6 +13,7 @@ struct EditorNode
     RUNNING = 0,
     FAILED = 1,
     SUCCEEDED = 2
+
   };
 
   int id;

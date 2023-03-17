@@ -55,9 +55,9 @@ bool DebugManager::getNodeUpdates(unsigned int& nodeId, unsigned int& actorId, u
   try {
     size_t recv_size;
     unsigned int priority;
-    if (msgQueue.get_num_msg() < msgQueue.get_max_msg()) {
+    if (msgQueue.get_num_msg() > 0) {
       msgQueue.receive(m_nodeUpdateBuffer, sizeof(m_nodeUpdateBuffer), recv_size, priority);
-      if (recv_size == 3) { //always expect 3 items
+      if (recv_size == 12) { //always expect 3 items
         nodeId = m_nodeUpdateBuffer[0];
         actorId = m_nodeUpdateBuffer[1];
         status = m_nodeUpdateBuffer[2];
@@ -74,7 +74,7 @@ bool DebugManager::getNodeUpdates(unsigned int& nodeId, unsigned int& actorId, u
 
 std::unordered_map<unsigned int, std::string> DebugManager::getAllActors() const
 {
-  std::unordered_map<unsigned int, std::string> map;
+  std::unordered_map<unsigned int, std::string> map = {};
   for (auto it = m_actorIdMap->begin(); it != m_actorIdMap->end(); it++) {
     map.emplace(it->first, std::string(it->second.begin(), it->second.end()));
   }

@@ -39,6 +39,9 @@ namespace ArborMaster
 
     struct GLFWwindow* m_window;
 
+  private:
+    bool loadTreeRuntime(unsigned int id);
+
 
   public:
     Application();

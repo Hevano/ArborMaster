@@ -2,7 +2,7 @@
 
 namespace ArborMaster
 {
-Application::Application() {
+  Application::Application() {
   glfwInit();
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -49,7 +49,7 @@ Application::Application() {
   m_debugManager.reset(DebugManager::createInstance());
 
   if (m_debugManager) {
-    m_ui.actorClickCallback = [&](unsigned int x) { return m_debugManager->selectActor(x); };
+    m_ui.actorClickCallback = std::bind(&Application::loadTreeRuntime, this, std::placeholders::_1);
   }
   
 }
@@ -97,9 +97,8 @@ void Application::run() {
     m_ui.drawSaveAsPopup(m_editorTree.getPath());
 
     if (m_debugManager) {
-      unsigned int actorId, nodeId, status;
-      m_debugManager->getNodeUpdates(actorId, nodeId, status);
-      if (actorId == m_debugManager->getCurrentActor()) {
+      unsigned int actorId, nodeId, status = 0;
+      if (m_debugManager->getNodeUpdates(nodeId, actorId, status) && actorId == m_debugManager->getCurrentActor()) {
         m_editorTree.updateNodeStatus(nodeId, status);
       }
     }
@@ -132,6 +131,19 @@ void Application::saveTree()
 void Application::newTree() {}
 void Application::loadTree()
 {
+  m_editorTree = EditorTree();
   m_exporter.loadDesign(m_editorTree, m_nf, m_editorTree.getPath());
 }
+
+bool Application::loadTreeRuntime(unsigned int id)
+{
+  if (m_debugManager->selectActor(id)) {
+    auto m = m_debugManager->getAllActors();
+    auto debugPath = m.at(id);
+    m_editorTree = EditorTree();
+    return m_exporter.loadDesign(m_editorTree, m_nf, debugPath);
+  }
+  return false;
+}
+
 }
