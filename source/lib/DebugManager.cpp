@@ -12,6 +12,8 @@ DebugManager* DebugManager::createInstance()
     dm->m_segment = ipc::managed_shared_memory(ipc::open_only, "DebuggerSharedMemory");
     dm->m_blackBoardMap.reset(dm->m_segment.find_or_construct<bb_map_type>("BlackboardMap")(dm->m_segment.get_segment_manager()));
     dm->m_actorIdMap.reset(dm->m_segment.find_or_construct<actorid_map_type>("ActorIdMap")(dm->m_segment.get_segment_manager()));
+    dm->m_actorIdMessageQueue.reset(new ipc::message_queue(ipc::open_or_create, "ActorSelectMessageQueue", 100, sizeof(unsigned int)));
+    dm->m_nodeUpdateMessageQueue.reset(new ipc::message_queue(ipc::open_or_create, "NodeUpdateMessageQueue", 100, sizeof(unsigned int) * 3));
 
     //Loop through the paths found in ActorIdMap and ensure that those files exist, both as json and ini
 
@@ -51,12 +53,11 @@ DebugManager* DebugManager::createInstance()
 
 bool DebugManager::getNodeUpdates(unsigned int& nodeId, unsigned int& actorId, unsigned int& status)
 {
-  ipc::message_queue msgQueue(ipc::open_or_create, "NodeUpdateMessageQueue", 100, sizeof(unsigned int));
   try {
     size_t recv_size;
     unsigned int priority;
-    if (msgQueue.get_num_msg() > 0) {
-      msgQueue.receive(m_nodeUpdateBuffer, sizeof(m_nodeUpdateBuffer), recv_size, priority);
+    if (m_nodeUpdateMessageQueue->get_num_msg() > 0) {
+      m_nodeUpdateMessageQueue->receive(m_nodeUpdateBuffer, sizeof(m_nodeUpdateBuffer), recv_size, priority);
       if (recv_size == 12) { //always expect 3 items
         nodeId = m_nodeUpdateBuffer[0];
         actorId = m_nodeUpdateBuffer[1];
@@ -83,14 +84,13 @@ std::unordered_map<unsigned int, std::string> DebugManager::getAllActors() const
 
 bool DebugManager::selectActor(unsigned int actorId)
 {
-  ipc::message_queue mq(ipc::open_or_create, "ActorSelectMessageQueue", 100, sizeof(unsigned int));
   try {
-    mq.send(&actorId, sizeof(actorId), 0);
+    m_actorIdMessageQueue->send(&actorId, sizeof(actorId), 0);
     m_currentActorId = actorId;
     return true;
   }
   catch (ipc::interprocess_exception& ex) {
-    //throws error if queue is empty
+    std::cout << "Error: " << ex.what() << std::endl;
   }
   return false;
 }

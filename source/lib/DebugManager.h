@@ -27,6 +27,8 @@ private:
   ipc::managed_shared_memory m_segment;
   std::unique_ptr<bb_map_type> m_blackBoardMap;
   std::unique_ptr<actorid_map_type> m_actorIdMap;
+  std::unique_ptr <ipc::message_queue> m_actorIdMessageQueue;
+  std::unique_ptr <ipc::message_queue> m_nodeUpdateMessageQueue;
 
 private:
   //Only construct using createInstance
