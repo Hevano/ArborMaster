@@ -43,6 +43,7 @@ FetchContent_Declare(
   GIT_REPOSITORY https://github.com/boostorg/boost.git
   GIT_TAG boost-1.80.0
 )
+
 FetchContent_MakeAvailable(Boost)
 
 
@@ -61,6 +62,7 @@ target_include_directories(
     ArborMaster_lib ${warning_guard}
     PUBLIC
     "$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/source>"
+    ${Boost_INCLUDE_DIRS}
 )
 
 target_compile_features(ArborMaster_lib PUBLIC cxx_std_20)
@@ -68,6 +70,32 @@ target_compile_features(ArborMaster_lib PUBLIC cxx_std_20)
 target_link_libraries(ArborMaster_lib PUBLIC glfw OpenGL::GL glad imgui imnodes Boost::interprocess)
 
 target_link_libraries(ArborMaster_lib PUBLIC nlohmann_json::nlohmann_json)
+
+
+
+
+# ---- Declare adapter library ----
+
+file (GLOB adapter_sources  "./source/adapter/*.cpp" "./source/adapter/*.h")
+
+add_library(
+    ArborMaster_adapter STATIC
+    ${adapter_sources}
+)
+
+target_include_directories(
+    ArborMaster_adapter ${warning_guard}
+    PUBLIC
+    "$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/source>"
+    "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>"
+    ${Boost_INCLUDE_DIRS}
+)
+
+target_compile_features(ArborMaster_adapter PUBLIC cxx_std_20)
+
+target_link_libraries(ArborMaster_adapter PUBLIC Boost::interprocess nlohmann_json::nlohmann_json)
+
+# set_target_properties(${PROJECT_NAME} PROPERTIES PUBLIC_HEADER "./source/adapter/ArborMasterAdapter.h")
 
 
 # ---- Declare executable ----
@@ -89,6 +117,29 @@ target_link_libraries(ArborMaster_exe PRIVATE ArborMaster_lib)
 if(NOT CMAKE_SKIP_INSTALL_RULES)
   include(cmake/install-rules.cmake)
 endif()
+
+include(GNUInstallDirs)
+
+message(STATUS ${CMAKE_INSTALL_LIBDIR})
+
+install(TARGETS ArborMaster_adapter boost_interprocess nlohmann_json
+        EXPORT ArborMaster_adapterTargets
+        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+        INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+)
+
+set(adapterHeaders
+    source/adapter/Adapter.h
+    source/adapter/Debugger.h
+)
+
+install(FILES ${adapterHeaders} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+
+
+
+
 
 # ---- Developer mode ----
 

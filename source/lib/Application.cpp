@@ -131,8 +131,9 @@ void Application::saveTree()
 void Application::newTree() {}
 void Application::loadTree()
 {
+  auto p = m_editorTree.getPath();
   m_editorTree = EditorTree();
-  m_exporter.loadDesign(m_editorTree, m_nf, m_editorTree.getPath());
+  m_exporter.loadDesign(m_editorTree, m_nf, p);
 }
 
 bool Application::loadTreeRuntime(unsigned int id)
