@@ -10,9 +10,7 @@ set(CMAKE_CXX_STANDARD 14)
 
 set(cxx_strict_flags "/W0")
 
-add_compile_options(
-    /W0
-)
+add_compile_options(/W0)
 
 include(FetchContent)
 FetchContent_Declare(

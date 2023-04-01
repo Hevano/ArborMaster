@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 #include "lib.hpp"
 #include "TreeNodeTest.h"
-#include "BehaviourTreeTest.h"
+#include "EditorTreeTest.h"
 #include "AIActorTest.h"
 #include "NodeFactoryTest.h"
 #include "NodeImporterTest.h"

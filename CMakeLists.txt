@@ -46,7 +46,6 @@ FetchContent_Declare(
 
 FetchContent_MakeAvailable(Boost)
 
-
 # ---- Declare library ----
 
 file (GLOB lib_sources  "./source/lib/*.cpp" "./source/lib/*.h")
@@ -64,6 +63,8 @@ target_include_directories(
     "$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/source>"
     ${Boost_INCLUDE_DIRS}
 )
+
+target_compile_options(ArborMaster_lib PRIVATE /W0)
 
 target_compile_features(ArborMaster_lib PUBLIC cxx_std_20)
 

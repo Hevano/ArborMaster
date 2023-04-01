@@ -108,15 +108,15 @@ void ArborMaster::EditorTree::drawDropZone(const NodeFactory& nodeCache)
 
 void ArborMaster::EditorTree::deleteLink(EditorLink link)
 {
+  if (!m_editorLinks.contains(link.id)) return;
   int parentId = getLinkParent(link);
   int childId = getLinkChild(link);
-  for (auto& [p, childList] : m_adjList) {
-    if (p == parentId) {
-      auto it = std::find(childList.begin(), childList.end(), childId);
-      if (it != childList.end()) {
-        m_freeNodes.emplace(childId);
-        childList.erase(it);
-      }
+  if (m_adjList.contains(parentId)) {
+    auto& childList = m_adjList.at(parentId);
+    auto it = std::find(childList.begin(), childList.end(), childId);
+    if (it != childList.end()) {
+      m_freeNodes.emplace(childId);
+      childList.erase(it);
     }
   }
   m_editorLinks.erase(link.id);

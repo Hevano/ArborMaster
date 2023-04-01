@@ -14,6 +14,7 @@ namespace ArborMaster {
   class EditorTree
   {
     friend class TreeExporter;
+    friend class EditorTreeTest;
 
   private:
     int m_editorId = 2; //Node Id 1 is reserved by the root
@@ -38,28 +39,6 @@ namespace ArborMaster {
     void deleteLink(EditorLink link);
     void deleteEditorNode(EditorNode node);
 
-    //Id Conversion Functions
-
-    int inline getLinkParent(const EditorLink& link) const 
-    { 
-      return link.startId >> 16; 
-    }
-
-    int inline getLinkChild(const EditorLink& link) const
-    {
-      return link.endId >> 8;
-    }
-
-    int inline getNodeInputId(const EditorNode& node) const 
-    {
-      return node.id << 8;
-    }
-
-    int inline getNodeOutputId(const EditorNode& node)
-    {
-      return node.id << 16;
-    }
-
     void setNodeColor(const EditorNode& node);
     
 
@@ -75,6 +54,8 @@ namespace ArborMaster {
     const Blackboard& getBlackboard() const;
     void drawDropZone(const NodeFactory& nodeCache);
     void draw(const NodeFactory& nodeCache);
+
+    //Updates the running status of a node
     void updateNodeStatus(unsigned int nodeId, unsigned int status);
 
     const inline std::string& getPath() const
@@ -94,6 +75,28 @@ namespace ArborMaster {
     int inline getNewId()
     {
       return ++m_editorId;
+    }
+
+    //Id Conversion Functions
+
+    int inline getLinkParent(const EditorLink& link) const
+    {
+      return link.startId >> 16;
+    }
+
+    int inline getLinkChild(const EditorLink& link) const
+    {
+      return link.endId >> 8;
+    }
+
+    int inline getNodeInputId(const EditorNode& node) const
+    {
+      return node.id << 8;
+    }
+
+    int inline getNodeOutputId(const EditorNode& node)
+    {
+      return node.id << 16;
     }
 
   };
