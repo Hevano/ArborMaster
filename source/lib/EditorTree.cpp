@@ -130,16 +130,29 @@ void ArborMaster::EditorTree::deleteEditorNode(EditorNode node)
   else {
     int parentId = -1;
     int linkId = -1;
+
+    std::vector<int> childLinks;
+    //Find the link, if any, where this node is the child
     for (auto& [id, link] : m_editorLinks) {
       if (getLinkChild(link) == node.id) {
         linkId = link.id;
         parentId = getLinkParent(link);
+      } else if(getLinkParent(link) == node.id) { //Also, save any child links of this node
+        childLinks.push_back(link.id);
       }
     }
+    //If such a link is found, delete this node from it's parent's adjacency list and remove the link
     if (parentId != -1 && linkId != -1) {
       auto it = std::find(m_adjList[parentId].begin(), m_adjList[parentId].end(), node.id);
       m_adjList[parentId].erase(it);
       m_editorLinks.erase(linkId);
+    }
+    //Remove any child links the node has and clear it from the adjacency list
+    if (m_adjList.contains(node.id)) {
+      for (auto childLinkId : childLinks) {
+        deleteLink(m_editorLinks[childLinkId]);
+      }
+      m_adjList.erase(node.id);
     }
   }
   m_editorNodes.erase(node.id);

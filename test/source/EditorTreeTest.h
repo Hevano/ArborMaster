@@ -61,14 +61,14 @@ namespace ArborMaster {
 
       EditorLink l;
       l.id = bt.getNewId();
-      l.startId = bt.getNodeOutputId(bt.m_editorNodes[2]);
-      l.endId = bt.getNodeInputId(bt.m_editorNodes[3]);
+      l.startId = bt.getNodeOutputId(bt.m_editorNodes[3]);
+      l.endId = bt.getNodeInputId(bt.m_editorNodes[4]);
       bt.m_editorLinks.emplace(l.id, l);
       bt.m_adjList[bt.getLinkParent(l)].push_back(bt.getLinkChild(l));
 
       l.id = bt.getNewId();
-      l.startId = bt.getNodeOutputId(bt.m_editorNodes[2]);
-      l.endId = bt.getNodeInputId(bt.m_editorNodes[4]);
+      l.startId = bt.getNodeOutputId(bt.m_editorNodes[3]);
+      l.endId = bt.getNodeInputId(bt.m_editorNodes[5]);
       bt.m_editorLinks.emplace(l.id, l);
       bt.m_adjList[bt.getLinkParent(l)].push_back(bt.getLinkChild(l));
     }
@@ -142,7 +142,7 @@ namespace ArborMaster {
     deleteLink(l);
 
     //Check # of links
-    ASSERT_TRUE(getEditorLinks().size() == 1) << "Number of links not reduced after link is deleted";
+    ASSERT_EQ(getEditorLinks().size(), 1) << "Number of links not reduced after link is deleted";
 
     //Check link doesn't exist
     ASSERT_FALSE(getEditorLinks().contains(l.id)) << "Link still in editor links after deletion";
@@ -150,7 +150,7 @@ namespace ArborMaster {
     //Check adj list is updated
 
     ASSERT_TRUE(getAdjList().contains(parentId)) << "Parent was removed from adj list when link";
-    ASSERT_TRUE(getAdjList().at(parentId).size() == 0) << "Removing link did not update adjacency list";
+    ASSERT_EQ(getAdjList().at(parentId).size(), 1) << "Removing link did not update adjacency list";
 
   }
 
@@ -242,16 +242,18 @@ namespace ArborMaster {
 
     //Create Node, but don't add it to
     EditorNode n(child1, ImVec2(), bt.getNewId());
+    EXPECT_EQ(getAdjList()[3].size(), 2) << "Beginning adj value is incorrect";
 
     //Delete Node
     deleteEditorNode(n);
 
     //Check lists empty
-    ASSERT_TRUE(getEditorLinks().empty()) << "Deletion created link(s)";
-    ASSERT_TRUE(getAdjList().empty()) << "Deletion created adj list item(s)";
+    EXPECT_EQ(getEditorLinks().size(), 2) << "Deletion of non-existing node altered link(s)";
+    EXPECT_EQ(getAdjList().size(), 1) << "Deletion of non-existing node altered adj list";
+    EXPECT_EQ(getAdjList()[3].size(), 2) << "Deletion of non-existing node altered adj list item(s)";
 
-    ASSERT_TRUE(getFreeNodes().empty()) << "Deletion created adj list item(s)";
-    ASSERT_TRUE(getEditorNodes().empty()) << "Deletion created adj list item(s)";
+    EXPECT_TRUE(getFreeNodes().empty()) << "Deletion of non-existing node created free nodes";
+    EXPECT_EQ(getEditorNodes().size(), 3) << "Deletion of non-existing node altered editor nodes";
   }
 
   //Delete a Node from an empty tree
