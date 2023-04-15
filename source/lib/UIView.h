@@ -28,12 +28,16 @@ namespace ArborMaster {
 			{ ToolBarActions::Import, "Tree Import" },
 		};
 
+		bool m_alertTriggered = false;
+		std::string m_alertMsg = "";
+
 	public:
 		std::function<void(void)> exportCallback;
 		std::function<void(void)> importCallback;
 		std::function<void(void)> saveCallback;
 		std::function<void(void)> loadCallback;
 		std::function<void(void)> newTreeCallback;
+		std::function<void(void)> debuggerCallback;
 		std::function<bool(unsigned int)> actorClickCallback;
 
 	public:
@@ -42,6 +46,7 @@ namespace ArborMaster {
 		void drawNewPopup(std::string& path);
 		void drawOpenPopup(std::string& path);
 		void drawSaveAsPopup(std::string& path);
+		void drawAlertPopup();
 
 		//Returns true if popup was opened
 		bool drawToolbar(std::string& exportPath, std::string& importPath, std::string& savePath);
@@ -52,6 +57,7 @@ namespace ArborMaster {
 		void drawBlackboard(const EditorTree& tree);
 		void drawBlackboard(const std::unordered_map<std::string, std::string>& debugBlackboard);
 		void pollHotKeys();
+		void triggerAlert(const std::string msg);
 
 	private:
 		void drawPopup(

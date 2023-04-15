@@ -29,7 +29,7 @@ public:
     m_path = path;
   }
   //Exports the tree to m_path for use in client code
-  void exportTree(const EditorTree& tree) const;
+  bool exportTree(const EditorTree& tree) const;
 
   //saves the design of the tree to path in serialized json format
   void saveDesign(const EditorTree& t, int currentId) const;

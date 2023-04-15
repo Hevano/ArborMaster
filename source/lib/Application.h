@@ -47,11 +47,11 @@ namespace ArborMaster
     Application();
     ~Application();
     void run();
-    void setSourcePath(const std::string& path);
     void importNodes();
     void exportTree();
     void saveTree();
     void newTree();
     void loadTree();
+    void launchDebugger();
   };
 }

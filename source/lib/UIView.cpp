@@ -36,6 +36,16 @@ void ArborMaster::UIView::drawSaveAsPopup(std::string& path)
   drawPopup(POPUP_NAMES.at(ToolBarActions::SaveAs), "Save design as a new file.", path, saveCallback, "Save Path");
 }
 
+void ArborMaster::UIView::drawAlertPopup()
+{
+  std::string s;
+  if (m_alertTriggered) {
+    m_alertTriggered = false;
+    ImGui::OpenPopup("Alert");
+  }
+  drawPopup("Alert", m_alertMsg, s, [&]() { m_alertMsg = ""; });
+}
+
 
 void ArborMaster::UIView::drawActorList(const std::unordered_map<unsigned int, std::string>& actorMap)
 {
@@ -87,9 +97,11 @@ void ArborMaster::UIView::drawPopup(
       if (callback) callback();
       ImGui::CloseCurrentPopup();
     }
-    ImGui::SameLine();
-    if (ImGui::Button("Cancel", ImVec2(120, 0))) {
-      ImGui::CloseCurrentPopup();
+    if (!fieldText.empty()) {
+      ImGui::SameLine();
+      if (ImGui::Button("Cancel", ImVec2(120, 0))) {
+        ImGui::CloseCurrentPopup();
+      }
     }
     ImGui::EndPopup();
   }
@@ -141,6 +153,9 @@ bool ArborMaster::UIView::drawToolbar(
             ImGui::EndMenu();
         }
         if (ImGui::BeginMenu("View")) {
+            if (ImGui::MenuItem("Debugging", "CTRL+D")) {
+              if (debuggerCallback) debuggerCallback();
+            }
             if (ImGui::MenuItem("Center", "CTRL+Space")) {
               ImNodes::EditorContextGet().Panning = ImNodes::GetCurrentContext()->CanvasRectScreenSpace.GetCenter() - ImNodes::GetNodeGridSpacePos(1);
             }
@@ -313,8 +328,15 @@ void ArborMaster::UIView::pollHotKeys()
 
   //Center
   if (ImGui::IsKeyDown(ImGuiKey_Space) && ImGui::GetIO().KeyCtrl) {
-    ImNodes::EditorContextGet().Panning = ImNodes::GetCurrentContext()->CanvasRectScreenSpace.GetCenter() - ImNodes::GetNodeGridSpacePos(1);
+    ImNodes::EditorContextGet().Panning = 
+      ImNodes::GetCurrentContext()->CanvasRectScreenSpace.GetCenter() - ImNodes::GetNodeGridSpacePos(1);
   }
 
 
+}
+
+void ArborMaster::UIView::triggerAlert(const std::string msg)
+{
+  m_alertTriggered = true;
+  m_alertMsg = msg;
 }
