@@ -46,11 +46,12 @@ namespace ArborMaster {
 		//Returns true if popup was opened
 		bool drawToolbar(std::string& exportPath, std::string& importPath, std::string& savePath);
 		void drawActorList(const std::unordered_map<unsigned int, std::string>& actorMap);
-		void drawTabs();
+		void drawTabs(const std::string& tabName);
 		void drawNodeList(const NodeFactory& nodeCache);
 		void drawNode(const TreeNode& n, bool draggable = false);
 		void drawBlackboard(const EditorTree& tree);
 		void drawBlackboard(const std::unordered_map<std::string, std::string>& debugBlackboard);
+		void pollHotKeys();
 
 	private:
 		void drawPopup(
@@ -60,6 +61,7 @@ namespace ArborMaster {
 			std::function<void(void)> callback,
 			std::string fieldText = ""
 		);
+
 	};
 }
 

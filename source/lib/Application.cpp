@@ -34,9 +34,10 @@ namespace ArborMaster
   ImNodes::CreateContext();
   ImNodes::GetIO().LinkDetachWithModifierClick.Modifier = &ImGui::GetIO().KeyCtrl;
 
-  importNodes();
 
-  
+  importNodes();
+  //Default path, change later
+  m_importer.setPath("..\\..\\SaplingTactics\\source\\lib\\BehaviourNodes.h");
 
   //Bind UI Callbacks
   m_ui.exportCallback = std::bind(&Application::exportTree, this);
@@ -51,7 +52,7 @@ namespace ArborMaster
   if (m_debugManager) {
     m_ui.actorClickCallback = std::bind(&Application::loadTreeRuntime, this, std::placeholders::_1);
   }
-  
+
 }
 Application::~Application() {
   ImGui_ImplGlfw_Shutdown();
@@ -71,8 +72,7 @@ void Application::run() {
     ImGui::NewFrame();
 
     //Draw
-    //ImGui::ShowDemoWindow();
-    m_ui.drawTabs();
+    m_ui.drawTabs(m_editorTree.getPath());
     m_ui.drawNodeList(m_nf);
     
     if (m_debugManager) {
@@ -90,10 +90,12 @@ void Application::run() {
       m_ui.drawActorList(m_debugManager->getAllActors());
     }
 
+    m_ui.pollHotKeys();
+
     m_ui.drawExportPopup(m_exporter.getPath());
     m_ui.drawImportPopup(m_importer.getPath());
-    m_ui.drawNewPopup(m_editorTree.getPath()); //replace with different / new path variables
-    m_ui.drawOpenPopup(m_editorTree.getPath()); //replace with different / new path variables
+    m_ui.drawNewPopup(m_editorTree.getPath());
+    m_ui.drawOpenPopup(m_editorTree.getPath());
     m_ui.drawSaveAsPopup(m_editorTree.getPath());
 
     if (m_debugManager) {
@@ -106,9 +108,6 @@ void Application::run() {
     //Draw Tree
     m_editorTree.draw(m_nf);
 
-
-    ImGui::ShowDemoWindow();
-
     //Display Frame
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
@@ -117,8 +116,6 @@ void Application::run() {
 }
 void Application::setSourcePath(const std::string& path) {}
 void Application::importNodes() {
-  m_importer.setPath("C:\\Users\\Evano\\source\\repos\\SaplingTactics\\source\\lib\\BehaviourNodes.h");
-
   m_importer.importAll(m_nf.getNodes());
 }
 void Application::exportTree() {
@@ -127,7 +124,11 @@ void Application::exportTree() {
 void Application::saveTree(){
   m_exporter.saveDesign(m_editorTree, m_editorTree.getNewId() - 1);
 }
-void Application::newTree() {}
+void Application::newTree() {
+  auto pathString = m_editorTree.getPath();
+  m_editorTree = EditorTree();
+  m_editorTree.setPath(pathString);
+}
 void Application::loadTree() {
   auto p = m_editorTree.getPath();
   m_editorTree = EditorTree();

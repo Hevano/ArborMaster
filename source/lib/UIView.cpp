@@ -141,7 +141,9 @@ bool ArborMaster::UIView::drawToolbar(
             ImGui::EndMenu();
         }
         if (ImGui::BeginMenu("View")) {
-            
+            if (ImGui::MenuItem("Center", "CTRL+Space")) {
+              ImNodes::EditorContextGet().Panning = ImNodes::GetCurrentContext()->CanvasRectScreenSpace.GetCenter() - ImNodes::GetNodeGridSpacePos(1);
+            }
             ImGui::EndMenu();
         }
         ImGui::EndMainMenuBar();
@@ -153,7 +155,7 @@ bool ArborMaster::UIView::drawToolbar(
     return toolbarAction != ToolBarActions::None;
 }
 
-void ArborMaster::UIView::drawTabs()
+void ArborMaster::UIView::drawTabs(const std::string& tabName)
 {
     ImGuiWindowFlags windowFlags = 0;
     windowFlags |= ImGuiWindowFlags_NoTitleBar;
@@ -168,16 +170,8 @@ void ArborMaster::UIView::drawTabs()
     ImGui::SetNextWindowPos(ImGui::GetMainViewport()->WorkPos, ImGuiCond_Always, ImVec2(0.0f, 0.0f));
     ImGui::Begin("Tabs", nullptr, windowFlags);
     if (ImGui::BeginTabBar("##Tabs", ImGuiTabBarFlags_None)) {
-        if (ImGui::BeginTabItem("Tree1.json")) {
-            ImGui::TextWrapped(
-                "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do "
-                "eiusmod tempor incididunt ut labore et dolore magna aliqua. ");
-            ImGui::EndTabItem();
-        }
-        if (ImGui::BeginTabItem("Tree2.json")) {
-            ImGui::TextWrapped(
-                "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do "
-                "eiusmod tempor incididunt ut labore et dolore magna aliqua. ");
+        if (ImGui::BeginTabItem(std::filesystem::path(tabName).filename().string().c_str())) {
+            ImGui::TextWrapped("Easter Egg");
             ImGui::EndTabItem();
         }
         ImGui::EndTabBar();
@@ -288,4 +282,39 @@ void ArborMaster::UIView::drawBlackboard(const std::unordered_map<std::string, s
     n++;
   }
   ImGui::End();
+}
+
+void ArborMaster::UIView::pollHotKeys()
+{
+  //Saving
+  if (ImGui::IsKeyDown(ImGuiKey_S) && ImGui::GetIO().KeyCtrl) {
+    ImGui::OpenPopup(POPUP_NAMES.at(ToolBarActions::SaveAs).c_str());
+  }
+
+  //Opening
+  if (ImGui::IsKeyDown(ImGuiKey_O) && ImGui::GetIO().KeyCtrl) {
+    ImGui::OpenPopup(POPUP_NAMES.at(ToolBarActions::Open).c_str());
+  }
+
+  //Export
+  if (ImGui::IsKeyDown(ImGuiKey_E) && ImGui::GetIO().KeyCtrl) {
+    ImGui::OpenPopup(POPUP_NAMES.at(ToolBarActions::Export).c_str());
+  }
+
+  //Import
+  if (ImGui::IsKeyDown(ImGuiKey_I) && ImGui::GetIO().KeyCtrl) {
+    ImGui::OpenPopup(POPUP_NAMES.at(ToolBarActions::Import).c_str());
+  }
+
+  //New
+  if (ImGui::IsKeyDown(ImGuiKey_N) && ImGui::GetIO().KeyCtrl) {
+    ImGui::OpenPopup(POPUP_NAMES.at(ToolBarActions::New).c_str());
+  }
+
+  //Center
+  if (ImGui::IsKeyDown(ImGuiKey_Space) && ImGui::GetIO().KeyCtrl) {
+    ImNodes::EditorContextGet().Panning = ImNodes::GetCurrentContext()->CanvasRectScreenSpace.GetCenter() - ImNodes::GetNodeGridSpacePos(1);
+  }
+
+
 }
