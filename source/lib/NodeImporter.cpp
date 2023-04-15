@@ -17,7 +17,6 @@ void NodeImporter::importAll(std::unordered_map<std::string, TreeNode>& imported
   }
 }
 
-//TODO: Error Handling
 TreeNode NodeImporter::importNode(const std::string& source)
 {
   if (source.substr(0, NODE_FLAG_STRING.size()) == NODE_FLAG_STRING) {

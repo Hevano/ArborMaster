@@ -78,6 +78,7 @@ namespace ArborMaster {
       bt.m_editorId = 2;
       bt.m_editorLinks.clear();
       bt.m_editorNodes.clear();
+      bt.m_adjList.clear();
     }
 
     void SetUp() override

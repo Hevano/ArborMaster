@@ -27,13 +27,13 @@ DebugManager* DebugManager::createInstance()
       std::filesystem::path pathDesignIni(std::string(s.begin(), s.end()));
       pathDesignIni.replace_extension(".ini");
 
-      //if (pathDesignJson.extension() != ".json") throw std::exception();
-      //if(!std::filesystem::exists(pathDesignJson)) throw std::exception();
-      //if (!std::filesystem::exists(pathDesignIni)) throw std::exception();
+      if (pathDesignJson.extension() != ".json") throw std::exception();
+      if(!std::filesystem::exists(pathDesignJson)) throw std::exception();
+      if (!std::filesystem::exists(pathDesignIni)) throw std::exception();
 
-      ////Paths should be absolute
-      //if (!pathDesignJson.is_absolute()) throw std::exception();
-      //if (!pathDesignJson.is_absolute()) throw std::exception();
+      //Paths should be absolute
+      if (!pathDesignJson.is_absolute()) throw std::exception();
+      if (!pathDesignJson.is_absolute()) throw std::exception();
     }
 
     return dm;

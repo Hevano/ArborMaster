@@ -10,8 +10,6 @@ namespace ArborMaster
   private:
     std::unordered_map<std::string, TreeNode> m_nodes;
   public:
-    //TODO: Consider move semantics
-    TreeNode createNode(const std::string& nodeName) const;
     //const and non-const getters
     const std::unordered_map<std::string, TreeNode>& getNodes() const;
     inline std::unordered_map<std::string, TreeNode>& getNodes()

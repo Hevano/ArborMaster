@@ -117,6 +117,9 @@ void ArborMaster::EditorTree::deleteLink(EditorLink link)
     if (it != childList.end()) {
       m_freeNodes.emplace(childId);
       childList.erase(it);
+      if (childList.size() == 0) {
+        m_adjList.erase(parentId);
+      }
     }
   }
   m_editorLinks.erase(link.id);

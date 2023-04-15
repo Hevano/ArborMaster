@@ -15,6 +15,8 @@ class TreeNode;
 
 class NodeImporter
 {
+  friend class NodeImporterTest;
+
 private:
   std::string m_path;
   inline const static std::string NODE_FLAG_STRING = "//[ArborMaster]";

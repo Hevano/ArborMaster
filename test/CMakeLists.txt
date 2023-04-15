@@ -27,7 +27,7 @@ enable_testing()
 file (GLOB test_sources "./source/*.h")
 
 add_executable(ArborMaster_test source/ArborMaster_test.cpp ${test_sources} )
-target_link_libraries(ArborMaster_test PRIVATE ArborMaster_lib GTest::gtest_main)
+target_link_libraries(ArborMaster_test PRIVATE ArborMaster_lib ArborMaster_adapter GTest::gtest_main GTest::gmock GTest::gmock_main)
 target_compile_features(ArborMaster_test PRIVATE 
 	cxx_std_20
 )

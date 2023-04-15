@@ -15,6 +15,7 @@ class EditorNode;
 
 class TreeExporter
 {
+  friend class TreeExporterTest;
 private:
   std::string m_path;
 
@@ -39,7 +40,13 @@ public:
 private:
   json traverseTree(int id, const std::unordered_map<int, std::vector<int>>& adjList, const std::unordered_map<int, EditorNode>& nodes) const;
 
-
 };
+
+
+//nlohman::json converion definitions
+void to_json(json& j, const EditorLink& link);
+void from_json(const json& j, EditorLink& link);
+void to_json(json& j, const EditorNode& node);
+void from_json(const json& j, EditorNode& node);
 }
 

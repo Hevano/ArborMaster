@@ -15,6 +15,7 @@ namespace ArborMaster {
   {
     friend class TreeExporter;
     friend class EditorTreeTest;
+    friend class TreeExporterTest;
 
   private:
     int m_editorId = 2; //Node Id 1 is reserved by the root

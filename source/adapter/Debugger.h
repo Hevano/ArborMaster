@@ -20,6 +20,7 @@ namespace ArborMasterAdapter {
   };
 
   class Debugger {
+    friend class DebuggerTest;
   private:
     //Max number of bytes our shared memory buffer can hold
     const int MAX_BYTES = 65536;
@@ -42,6 +43,7 @@ namespace ArborMasterAdapter {
     std::unique_ptr <char_allocator> m_charAllocator;
 
     unsigned int m_currentActorId;
+    bool m_active = false;
 
   public:
 

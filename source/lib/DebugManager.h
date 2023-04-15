@@ -11,6 +11,7 @@
 namespace ipc = boost::interprocess;
 
 class DebugManager {
+  friend class DebugManagerTest;
 private:
   unsigned int m_nodeUpdateBuffer[3] = { 0,0,0 };
   unsigned int m_currentActorId = 0;

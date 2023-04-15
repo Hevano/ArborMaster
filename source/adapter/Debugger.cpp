@@ -19,6 +19,7 @@ namespace ArborMasterAdapter {
     m_actorIdMessageQueue.reset(new ipc::message_queue(ipc::open_or_create, "ActorSelectMessageQueue", 100, sizeof(unsigned int)));
     m_nodeUpdateMessageQueue.reset(new ipc::message_queue(ipc::open_or_create, "NodeUpdateMessageQueue", 100, sizeof(ActorUpdate)));
 
+    m_active = true;
 
     return true;
   }
@@ -47,8 +48,12 @@ namespace ArborMasterAdapter {
   Debugger::~Debugger()
   {
     // Deallocate the object in the shared memory segment
-    m_segment.destroy<actorid_map_type>("ActorIdMap");
-    m_segment.destroy<bb_map_type>("BlackboardMap");
+    if (m_active && m_segment.find<actorid_map_type>("ActorIdMap").first) {
+      m_segment.destroy<actorid_map_type>("ActorIdMap");
+    }
+    if (m_active && m_segment.find<bb_map_type>("BlackboardMap").first) {
+      m_segment.destroy<bb_map_type>("BlackboardMap");
+    }
 
     //Release the flat map pointers rather than allow unique_ptr to free them. TODO: add custom deleter to handle this properly
     m_actorIdMap.release();
@@ -99,7 +104,6 @@ namespace ArborMasterAdapter {
       else {
         m_blackBoardMap->insert({ keyBoostString, char_string(value.begin(), value.end(), *m_charAllocator) });
       }
-
     }
   };
 

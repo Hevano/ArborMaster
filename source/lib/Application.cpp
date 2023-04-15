@@ -124,20 +124,17 @@ void Application::importNodes() {
 void Application::exportTree() {
   m_exporter.exportTree(m_editorTree);
 }
-void Application::saveTree()
-{
+void Application::saveTree(){
   m_exporter.saveDesign(m_editorTree, m_editorTree.getNewId() - 1);
 }
 void Application::newTree() {}
-void Application::loadTree()
-{
+void Application::loadTree() {
   auto p = m_editorTree.getPath();
   m_editorTree = EditorTree();
   m_exporter.loadDesign(m_editorTree, m_nf, p);
 }
 
-bool Application::loadTreeRuntime(unsigned int id)
-{
+bool Application::loadTreeRuntime(unsigned int id) {
   if (m_debugManager->selectActor(id)) {
     auto m = m_debugManager->getAllActors();
     auto debugPath = m.at(id);

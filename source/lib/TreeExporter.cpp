@@ -24,10 +24,16 @@ void TreeExporter::exportTree(const EditorTree& tree) const
 
   jTree["debugPath"] = json(std::filesystem::absolute(designPath).c_str());
 
+  if (tree.m_adjList.size() == 0) {
+    return;
+  }
+
   for (auto childId : tree.m_adjList.at(1))
   {
     jTree["root"] = traverseTree(childId, tree.m_adjList, tree.m_editorNodes);
   }
+
+  
 
   std::ofstream stream(m_path);
   stream << std::setw(4) << jTree << std::endl;
@@ -64,7 +70,12 @@ void TreeExporter::saveDesign(const EditorTree& t, int currentId) const
   std::filesystem::path iniPathObj = t.getPath();
   iniPathObj.replace_extension(".ini");
 
-  ImNodes::SaveCurrentEditorStateToIniFile(iniPathObj.string().c_str());
+  try{
+    if(ImNodes::GetCurrentContext()) ImNodes::SaveCurrentEditorStateToIniFile(iniPathObj.string().c_str());
+  }
+  catch (std::exception e) {
+    //ImGui context not active.
+  }
 
   json j;
 
@@ -96,13 +107,26 @@ bool TreeExporter::loadDesign(EditorTree& t, const NodeFactory& nodeCache, const
     return false;
   }
 
-  ImNodes::LoadCurrentEditorStateFromIniFile(iniPathObj.string().c_str());
+  try {
+    if (ImNodes::GetCurrentContext()) ImNodes::LoadCurrentEditorStateFromIniFile(iniPathObj.string().c_str());
+  }
+  catch (std::exception e) {
+    //ImGui context not active.
+  }
+  
 
   std::ifstream stream(path);
   json data;
-  stream >> data;
 
-  stream.close();
+  try {
+    stream >> data;
+    if (data.size() == 0) throw std::exception();
+    stream.close();
+  }
+  catch (std::exception e) {
+    stream.close();
+    return false;
+  }
 
   data["editorNodes"].get_to(t.m_editorNodes);
   data["editorLinks"].get_to(t.m_editorLinks);
