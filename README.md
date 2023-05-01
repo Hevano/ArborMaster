@@ -13,13 +13,34 @@ In addition to the tool’s designing capability, the debugging feature links in
 https://user-images.githubusercontent.com/25439882/235268671-5f3db77e-014f-4f49-830c-c3b5b541e804.mp4
 
 
-
-
+# Example
+This project was developed alongside a demo game, Sapling Tactics, which can be found [here](https://github.com/Hevano/SaplingTactics).
 
 # Integration
 
 If you wish to integrate ArborMaster with your project, follow the steps below.
+1. Include ArborMaster_adapter.lib, and all headers in source/adapter as source files in your build
+2. In your behaviour tree implementation, nodes and actors should each have associated unique ids represented by unsigned ints
+3. In your tree implementation, include ArborMasterAdapter::Debugger, create a Debugger object, and call the relevant methods:
+    - updateNodeStatus, changes the status of a node in a specific actor's tree
+    - updateDebugBlackboard, when a blackboard value is added or changed
+    - createDebugActor, when an actor is created
+    - removeDebugActor, when an actor is removed
+    - resetDebugBlackboard, when the blackboard must be cleared
+    - tick, to check if new actor has been selected in the editor
+ 
+4. Flag node implementations in source code files.
 
+    - Use the format [ArborMaster]NodeName|Max Children|BlackboardKey1|...|BlackboardKeyN|
+
+3. Import node definitions into the editor using File->Import or Ctrl+I
+4. Design a tree, save the design, and export it to a json file using File->Export
+5. Include ArborMasterAdapter::Adapter to load and construct trees at runtime
+    - Create an Adapter Object
+    - Create a TreeDesignNode tree using Adapter::loadTree()
+    - Traverse the TreeDesignNode tree to construct your behaviour tree instance
+7. Edit and debug tree designs
+ 
 # Building and installing
 
 See the [BUILDING](BUILDING.md) document.
