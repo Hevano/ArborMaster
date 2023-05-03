@@ -120,6 +120,12 @@ namespace ArborMasterAdapter {
     m_actorIdMap->insert({ actorId, char_string(treePath.begin(), treePath.end(), *m_charAllocator) });
   };
 
+  void Debugger::removeDebugActor(unsigned int actorId)
+  {
+    m_actorIdMap->erase(actorId);
+    auto size = m_actorIdMap->size();
+  };
+
   void Debugger::resetDebugBlackboard(const std::unordered_map<std::string, std::string>& newBlackboard)
   {
     m_blackBoardMap->clear();

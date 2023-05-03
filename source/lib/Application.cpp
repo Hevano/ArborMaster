@@ -44,7 +44,16 @@ namespace ArborMaster
     m_ui.saveCallback = std::bind(&Application::saveTree, this);
     m_ui.newTreeCallback = std::bind(&Application::newTree, this);
     m_ui.loadCallback = std::bind(&Application::loadTree, this);
-    m_ui.debuggerCallback = std::bind(&Application::launchDebugger, this);
+    m_ui.debuggerCallback = [&]()
+    {
+      if (m_debugManager) {
+        m_debugManager.reset(nullptr);
+      }
+      else {
+        launchDebugger();
+      }
+      
+    };
 }
 Application::~Application() {
   ImGui_ImplGlfw_Shutdown();
@@ -100,8 +109,6 @@ void Application::run() {
 
     //Draw Tree
     m_editorTree.draw(m_nf);
-
-    ImGui::ShowDemoWindow();
 
     //Display Frame
     ImGui::Render();

@@ -1,5 +1,4 @@
 #pragma once
-#include "AIActor.h"
 #include "NodeFactory.h"
 #include "UIView.h"
 #include "NodeImporter.h"
@@ -27,8 +26,6 @@ namespace ArborMaster
   {
     friend class UIHelper;
   private:
-    
-    std::unordered_map<std::string, AIActor> m_actors;
     NodeFactory m_nf;
     NodeImporter m_importer;
     TreeExporter m_exporter;

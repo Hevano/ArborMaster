@@ -111,6 +111,39 @@ TEST_F(DebugManagerTest, getAllActorsEmpty)
   ASSERT_EQ(dm->getAllActors().size(), 0) << "Get all actors did not return empty dict when no actors existed";
 }
 
+TEST_F(DebugManagerTest, getAllActorsDeleted)
+{
+  ArborMasterAdapter::Debugger d;
+  ASSERT_TRUE(d.init());
+  auto path = std::filesystem::absolute("../../../test/assets/testDesign.json").string();
+  d.createDebugActor(0, path);
+  d.createDebugActor(1, path);
+
+  std::unique_ptr<DebugManager> dm(DebugManager::createInstance());
+  ASSERT_NE(dm.get(), nullptr) << "Create instance resulted in a nullptr";
+
+  auto actors = dm->getAllActors();
+
+  EXPECT_EQ(actors.size(), 2) << "Incorrect number of actors retrieved";
+
+  EXPECT_TRUE(actors.contains(0)) << "First actor not retreived";
+  EXPECT_TRUE(actors.contains(1)) << "Second actor not retreived";
+
+  EXPECT_EQ(actors[0], path) << "Actor has incorrect design path";
+  EXPECT_EQ(actors[1], path) << "Actor has incorrect design path";
+
+  d.removeDebugActor(1);
+
+  actors = dm->getAllActors();
+
+  EXPECT_EQ(actors.size(), 1) << "Incorrect number of actors retrieved";
+
+  EXPECT_TRUE(actors.contains(0)) << "First actor not retreived";
+  EXPECT_FALSE(actors.contains(1)) << "Second actor not retreived";
+
+  EXPECT_EQ(actors[0], path) << "Actor has incorrect design path";
+}
+
 TEST_F(DebugManagerTest, getBlackboardValid)
 {
   //Adapter debugger instance

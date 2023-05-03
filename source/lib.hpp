@@ -1,14 +1,6 @@
 #pragma once
 
-#include "lib/AIActor.h"
 #include "lib/Application.h"
-#include "lib/BehaviourTree.h"
-#include "lib/Blackboard.h"
-#include "lib/NodeFactory.h"
-#include "lib/NodeImporter.h"
-#include "lib/TreeExporter.h"
-#include "lib/TreeNode.h"
-#include "lib/UIHelper.h"
 
 #include <string>
 

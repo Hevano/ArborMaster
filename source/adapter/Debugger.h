@@ -69,6 +69,8 @@ namespace ArborMasterAdapter {
 
     //declares that there is an actor who uses a tree at the path
     void createDebugActor(unsigned int actorId, std::string treePath);
+    void removeDebugActor(unsigned int actorId);
+
 
     void resetDebugBlackboard(const std::unordered_map<std::string, std::string>& newBlackboard);
 

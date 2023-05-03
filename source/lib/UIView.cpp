@@ -13,7 +13,7 @@
 
 void ArborMaster::UIView::drawExportPopup(std::string& path)
 {
-    drawPopup(POPUP_NAMES.at(ToolBarActions::Export), "Tree Designs will be available in you're client code.", path, exportCallback, "Export path");
+    drawPopup(POPUP_NAMES.at(ToolBarActions::Export), "Tree Designs will be available in your client code.", path, exportCallback, "Export path");
 }
 
 void ArborMaster::UIView::drawImportPopup(std::string& path)

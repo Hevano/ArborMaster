@@ -75,7 +75,8 @@ bool DebugManager::getNodeUpdates(unsigned int& nodeId, unsigned int& actorId, u
 
 std::unordered_map<unsigned int, std::string> DebugManager::getAllActors() const
 {
-  std::unordered_map<unsigned int, std::string> map = {};
+  std::unordered_map<unsigned int, std::string> map;
+  auto size = m_actorIdMap->size();
   for (auto it = m_actorIdMap->begin(); it != m_actorIdMap->end(); it++) {
     map.emplace(it->first, std::string(it->second.begin(), it->second.end()));
   }

@@ -197,6 +197,27 @@ namespace ArborMasterAdapter {
     ASSERT_STREQ(path.c_str(), getActors()->at(0).c_str());
   }
 
+  TEST_F(DebuggerTest, DeleteDebugActorValid)
+  {
+    debugger.init();
+    auto path = std::filesystem::absolute("../../../test/assets/testDesign.json").string();
+    debugger.createDebugActor(0, path);
+    debugger.createDebugActor(1, path);
+
+    ASSERT_TRUE(getActors()->contains(0));
+    ASSERT_TRUE(getActors()->contains(1));
+
+    ASSERT_STREQ(path.c_str(), getActors()->at(0).c_str());
+    ASSERT_STREQ(path.c_str(), getActors()->at(1).c_str());
+
+    debugger.removeDebugActor(0);
+
+    ASSERT_FALSE(getActors()->contains(0));
+    ASSERT_TRUE(getActors()->contains(1));
+
+    ASSERT_STREQ(path.c_str(), getActors()->at(1).c_str());
+  }
+
   TEST_F(DebuggerTest, ResetDebugBlackboardValid)
   {
     debugger.init();
@@ -232,76 +253,8 @@ namespace ArborMasterAdapter {
     ASSERT_TRUE(checkBlackboardContains("reset_key")) << "Blackboard doesn't contain reset key";
     ASSERT_TRUE(checkBlackboardValue("reset_key", "reset_value")) << "Blackboard has wrong key value pair after reset";
   }
-}
 
-//TEST(TreeNodeTest, ChildInsert){
-//  TreeNode parent;
-//  TreeNode child1, child2, child3;
-//  child1.name = "child1";
-//  child2.name = "child2";
-//  child3.name = "child3";
-//  parent.insertChild(child1, 0);
-//  parent.insertChild(child2, 1);
-//  parent.insertChild(child3, 1);
-//
-//  ASSERT_EQ(parent.children.size(), 3);
-//
-//  EXPECT_EQ(parent.children[0]->name, "child1");
-//  EXPECT_EQ(parent.children[2]->name, "child2");
-//  EXPECT_EQ(parent.children[1]->name, "child3");
-//}
-//
-//TEST(TreeNodeTest, ChildLimit){
-//  TreeNode parent;
-//  parent.childCap = 2;
-//  TreeNode child1, child2, child3;
-//  child1.name = "child1";
-//  child2.name = "child2";
-//  child3.name = "child3";
-//  EXPECT_TRUE(parent.insertChild(child1, 0));
-//  EXPECT_TRUE(parent.insertChild(child2, 1));
-//  EXPECT_FALSE(parent.insertChild(child3, 2));
-//
-//  ASSERT_EQ(parent.children.size(), 2);
-//
-//  EXPECT_EQ(parent.children[0]->name, "child1");
-//  EXPECT_EQ(parent.children[1]->name, "child2");
-//}
-//
-//TEST(TreeNodeTest, RemoveChildren){
-//  TreeNode parent;
-//  TreeNode child1, child2, child3;
-//  child1.name = "child1";
-//  child2.name = "child2";
-//  child3.name = "child3";
-//  EXPECT_TRUE(parent.insertChild(child1, 0));
-//  EXPECT_TRUE(parent.insertChild(child2, 1));
-//  EXPECT_TRUE(parent.insertChild(child3, 2));
-//
-//  ASSERT_EQ(parent.children.size(), 3);
-//
-//  parent.removeChild(1);
-//
-//  EXPECT_EQ(parent.children.size(), 2);
-//  EXPECT_EQ(parent.children[0]->name, "child1");
-//  EXPECT_EQ(parent.children[1]->name, "child3");
-//}
-//
-//TEST(TreeNodeTest, ChildReorder)
-//{
-//  TreeNode parent;
-//  TreeNode child1, child2, child3;
-//  child1.name = "child1";
-//  child2.name = "child2";
-//  child3.name = "child3";
-//  parent.insertChild(child1, 0);
-//  parent.insertChild(child2, 1);
-//  parent.insertChild(child3, 2);
-//  parent.reorderChild(0, 1);
-//
-//  ASSERT_EQ(parent.children.size(), 3);
-//
-//  EXPECT_EQ(parent.children[1]->name, "child1");
-//  EXPECT_EQ(parent.children[0]->name, "child2");
-//  EXPECT_EQ(parent.children[2]->name, "child3");
-//}
+
+
+
+}
